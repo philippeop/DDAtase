@@ -7,14 +7,13 @@ Kevingranade, HerbertJones, Gim, Shades, Origamiwolf,
  A special thanks to Kevin and BurnZeZ for getting the
  larger view port working. Keep doing the impossible guys!
 
-The game now has configurable options.
-You can directly edit options.txt in the data directory, or
-under the help section.
+For latest discussions on Cataclysm DDA and its mods, please visit:
 
-If you change the viewport(play area) size, you NEED to restart
-for it to take effect.
+Homepage: http://www.cataclysmdda.com/
+Forum: http://www.cataclysmdda.com/smf/
+Wiki: http://wiki.cataclysmdda.com/
 
-Check out the options listing by pressing ?2
+The game now has new configurable options:
+Customizeable Viewport, Spawntype: Classic/Static
 
-As always, please visit the forums at:
-http://www.cataclysmdda.com/smf/index.php
+Ingame you can access the options via the help menu (?).
