@@ -48,9 +48,16 @@ class map
 // Visual Output
  void draw(game *g, WINDOW* w, const point center);
  void debug();
+// draw one square of terrain window
  void drawsq(WINDOW* w, player &u, const int x, const int y, const bool invert, const bool show_items,
              const int cx = -1, const int cy = -1,
              const bool low_light = false, const bool bright_level = false);
+// put a character into terrain window x, y = { 0.. SEEXY * 2 } -- note! y, then x
+ void putch (WINDOW* w, int y, int x, nc_color color, char sym);
+// draw fog of war in terrain window, x, y = global coords (relative to left-top map corner)
+ void draw_fog (WINDOW* w, player &u, int x, int y, nc_color color);
+// draw player in terrain window, always in center
+ void draw_player (WINDOW* w, player &u, int sel = 0);
 
 // File I/O
  virtual void save(overmap *om, unsigned const int turn, const int x, const int y);
@@ -115,6 +122,21 @@ class map
  bool flammable_items_at(const int x, const int y);
  bool moppable_items_at(const int x, const int y);
  point random_outdoor_tile();
+
+ // terrain feature (randomness + configuration for walls)
+ t_feature ter_feature (int x, int y);
+ // get terrain (walls/etc.) configuration
+ int ter_conf (int x, int y);
+ // set special terrain (walls/etc.) configuration
+ void set_ter_conf (int x, int y, int conf);
+ // set terrain (walls/etc.) configuration based on nearby terrain
+ void set_ter_conf (int x, int y);
+ // set terrain (walls/etc.) configuration based on nearby terrain, for all grid
+ void set_ter_conf ();
+ // check if terrain t should connect to terrain t2
+ static bool is_ter_connects (ter_id t, ter_id t2);
+ // returns symbol of terrain (according to its configuration)
+ char ter_sym (int x, int y);
 
  void translate(const ter_id from, const ter_id to); // Change all instances of $from->$to
  bool close_door(const int x, const int y, const bool inside);

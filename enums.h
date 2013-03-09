@@ -32,4 +32,30 @@ struct tripoint {
  ~tripoint(){}
 };
 
+////////TILES STUFF
+// if changing type, check
+// map::ter_conf, map::set_ter_conf, complex_tile::draw functions,
+// they're working with bits
+typedef unsigned short t_feature;
+
+enum ter_config
+{
+    tcf_w = 0x1,
+    tcf_e = 0x2,
+    tcf_n = 0x4,
+    tcf_s = 0x8,
+    tcf_uw = tcf_e | tcf_n | tcf_s,
+    tcf_ue = tcf_w | tcf_n | tcf_s,
+    tcf_un = tcf_e | tcf_w | tcf_s,
+    tcf_us = tcf_e | tcf_n | tcf_w
+};
+
+enum ter_config_diag
+{
+    tcf_nw = 0x10,
+    tcf_ne = 0x20,
+    tcf_sw = 0x40,
+    tcf_se = 0x80
+};
+
 #endif

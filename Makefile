@@ -45,12 +45,15 @@ DEBUG = -g
 VERSION = 0.1
 
 TARGET = cataclysm
+TARGET_TILES = catatiles
 W32TARGET = cataclysm.exe
 BINDIST_DIR = bindist
 
 ODIR = obj
+ODIRT = objt
 W32ODIR = objwin
 DDIR = .deps
+DDIRT = .depst
 
 OS  = $(shell uname -o)
 CXX = $(CROSS)g++
@@ -61,7 +64,7 @@ ifdef RELEASE
   DEBUG =
 endif
 
-CXXFLAGS = $(WARNINGS) $(DEBUG) $(PROFILE) $(OTHERS) -MMD
+CXXFLAGS = $(WARNINGS) $(DEBUG) $(PROFILE) $(OTHERS) -MMD -w
 
 BINDIST_EXTRAS = README data cataclysm-launcher
 BINDIST    = cataclysmdda-$(VERSION).tar.gz
@@ -107,6 +110,7 @@ endif
 SOURCES = $(wildcard *.cpp)
 _OBJS = $(SOURCES:.cpp=.o)
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
+OBJST = $(patsubst %,$(ODIRT)/%,$(_OBJS))
 
 all: $(TARGET)
 	@
@@ -114,6 +118,12 @@ all: $(TARGET)
 $(TARGET): $(ODIR) $(DDIR) $(OBJS)
 	$(CXX) $(W32FLAGS) -o $(TARGET) $(DEFINES) $(CXXFLAGS) \
           $(OBJS) $(LDFLAGS)
+
+tiles: $(TARGET_TILES)
+	@
+
+$(TARGET_TILES): $(ODIRT) $(DDIRT) $(OBJST)
+	$(CXX) $(W32FLAGS) -o $(TARGET_TILES) $(CXXFLAGS) $(OBJST) $(LDFLAGS) -L/lib -lgl -lglu -lglut -lopengl32 -lglut32 -lglu32
 
 $(ODIR):
 	mkdir $(ODIR)
@@ -124,9 +134,19 @@ $(DDIR):
 $(ODIR)/%.o: %.cpp
 	$(CXX) $(DEFINES) $(CXXFLAGS) -c $< -o $@
 
+$(ODIRT):
+	mkdir $(ODIRT)
+
+$(DDIRT):
+	@mkdir $(DDIRT)
+
+$(ODIRT)/%.o: %.cpp
+	$(CXX) $(CFLAGS) -DTILES -c $< -o $@
+
 clean:
 	rm -f $(TARGET) $(W32TARGET) $(ODIR)/*.o $(ODIR)/*.d $(W32ODIR)/*.o $(W32BINDIST) \
 	$(BINDIST)
+	rm -f $(TARGET_TILES) $(ODIRT)/*.o
 	rm -rf $(BINDIST_DIR)
 
 bindist: $(BINDIST)

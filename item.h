@@ -140,6 +140,7 @@ public:
  std::vector<item> contents;
 
  std::string name;
+ t_feature feature;
  char invlet;           // Inventory letter
  int charges;
  bool active;           // If true, it has active effects to be processed

@@ -270,6 +270,7 @@ public:
  int active_mission;
 
  std::string name;
+ unsigned long feature;
  bool male;
  bool my_traits[PF_MAX2];
  bool my_mutations[PF_MAX2];

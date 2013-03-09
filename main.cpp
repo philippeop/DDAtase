@@ -3,7 +3,6 @@
  * But maybe not
  * Who knows
  */
-
 #include "cursesdef.h"
 #include <ctime>
 #include "game.h"
@@ -20,70 +19,86 @@ void exit_handler(int s);
 int main(int argc, char *argv[])
 {
 #ifdef ENABLE_LOGGING
-  setupDebug();
+    setupDebug();
 #endif
- int seed = time(NULL);
+    int seed = time(NULL);
 
-//args: world seeding only.
- argc--; argv++;
- while (argc){
-  if(std::string(argv[0]) == "--seed"){
-   argc--; argv++;
-   if(argc){
-    seed = djb2_hash((unsigned char*)argv[0]);
-    argc--; argv++;
-   }
-  }
-  else // ignore unknown args.
-   argc--; argv++;
- }
+    //args: world seeding only.
+    argc--;
+    argv++;
+    while (argc)
+    {
+        if(std::string(argv[0]) == "--seed")
+        {
+            argc--;
+            argv++;
+            if(argc)
+            {
+                seed = djb2_hash((unsigned char*)argv[0]);
+                argc--;
+                argv++;
+            }
+        }
+        else // ignore unknown args.
+            argc--;
+        argv++;
+    }
 
-// ncurses stuff
- load_options(); // For getting size options
- initscr(); // Initialize ncurses
- noecho();  // Don't echo keypresses
- cbreak();  // C-style breaks (e.g. ^C to SIGINT)
- keypad(stdscr, true); // Numpad is numbers
- init_colors(); // See color.cpp
- curs_set(0); // Invisible cursor
- set_escdelay(10); // Make escape actually responsive
+    try
+    {
+        // ncurses stuff
+        if(!initscr()) return -1; //Init ncurses
+        load_options(); // For getting size options
+        initscr(); // Initialize ncurses
+        noecho();  // Don't echo keypresses
+        cbreak();  // C-style breaks (e.g. ^C to SIGINT)
+        keypad(stdscr, true); // Numpad is numbers
+        init_colors(); // See color.cpp
+        curs_set(0); // Invisible cursor
+        //set_escdelay(10); // Make escape actually responsive
 
- std::srand(seed);
+        std::srand(seed);
 
- bool quit_game = false;
- bool delete_world = false;
- game *g = new game;
- g->init_ui();
- MAPBUFFER.set_game(g);
- MAPBUFFER.load();
+        bool quit_game = false;
+        bool delete_world = false;
+        game *g = new game;
+        g->init_ui();
+        MAPBUFFER.set_game(g);
+        MAPBUFFER.load();
 
- #if (!(defined _WIN32 || defined WINDOWS))
-  struct sigaction sigIntHandler;
-  sigIntHandler.sa_handler = exit_handler;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
-  sigaction(SIGINT, &sigIntHandler, NULL);
- #endif
+#if (!(defined _WIN32 || defined WINDOWS))
+        struct sigaction sigIntHandler;
+        sigIntHandler.sa_handler = exit_handler;
+        sigemptyset(&sigIntHandler.sa_mask);
+        sigIntHandler.sa_flags = 0;
+        sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
 
- do {
-  g->setup();
-  while (!g->do_turn()) ;
-  if (g->uquit == QUIT_DELETE_WORLD)
-    delete_world = true;
-  if (g->game_quit())
-   quit_game = true;
- } while (!quit_game);
+        do
+        {
+            g->setup();
+            while (!g->do_turn()) ;
+            if (g->uquit == QUIT_DELETE_WORLD)
+                delete_world = true;
+            if (g->game_quit())
+                quit_game = true;
+        }
+        while (!quit_game);
 
- if (delete_world)
- {
-   g->delete_save();
- } else {
-  MAPBUFFER.save_if_dirty();
- }
+        if (delete_world)
+        {
+            g->delete_save();
+        }
+        else
+        {
+            MAPBUFFER.save_if_dirty();
+        }
+    }
+    catch (TerminationException ex) {}
 
- exit_handler(-999);
+    exit_handler(-999);
 
- return 0;
+    return 0;
 }
 
 void exit_handler(int s) {

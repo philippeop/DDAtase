@@ -144,6 +144,7 @@ class monster {
  bool dead;
  bool made_footstep;
  std::string unique_name; // If we're unique
+ t_feature feature;
 
 private:
  std::vector <point> plans;

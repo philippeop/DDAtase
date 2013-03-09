@@ -638,10 +638,18 @@ void vehicle::coord_translate (int dir, int reldx, int reldy, int &dx, int &dy)
     dy = tdir.dy() + tdir.ortho_dy(reldy);
 }
 
+#define VEHICLE_ORTHO_LAYOUT
+
 void vehicle::precalc_mounts (int idir, int dir)
 {
     if (idir < 0 || idir > 1)
         idir = 0;
+
+#ifdef VEHICLE_ORTHO_LAYOUT
+    tileray d4 (dir);
+    dir = d4.dir4() * 90;
+#endif
+
     for (int p = 0; p < parts.size(); p++)
     {
         int dx, dy;

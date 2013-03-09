@@ -145,7 +145,7 @@ std::string npc::save_info()
          pkill << " " <<  radiation << " " << cash << " " << recoil << " " <<
          scent << " " << moves << " " << underwater << " " << dodges_left <<
          " " << oxygen << " " << (marked_for_death ? "1" : "0") << " " <<
-         (dead ? "1" : "0") << " " << myclass << " " << patience << " ";
+         (dead ? "1" : "0") << " " << myclass << " " << feature << " " << patience << " ";
 
  for (int i = 0; i < PF_MAX2; i++)
   dump << my_traits[i] << " ";
@@ -224,7 +224,7 @@ void npc::load_info(game *g, std::string data)
          int_cur >> int_max >> per_cur >> per_max >> hunger >> thirst >>
          fatigue >> stim >> pain >> pkill >> radiation >> cash >> recoil >>
          scent >> moves >> underwater >> dodges_left >> oxygen >> deathtmp >>
-         deadtmp >> classtmp >> patience;
+         deadtmp >> classtmp >> feature >> patience;
 
  if (deathtmp == 1)
   marked_for_death = true;
@@ -1793,6 +1793,34 @@ int npc::speed_estimate(int speed)
  return rng(low, high);
 }
 
+#ifdef TILES
+void npc::draw(WINDOW* w, int ux, int uy, bool inv)
+{
+ int x = (SEEX + posx - ux);
+ int y = (SEEY + posy - uy);
+ if (x < 0 || x > SEEX * 2 ||
+     y < 0 || y > SEEY * 2)
+     return;
+
+ unsigned long att = 0;
+ if (attitude == NPCATT_KILL)
+  att = 0xff0000;
+ if (is_friend())
+  att = 0x00ff00;
+ else if (is_following())
+  att = 0x77ff77;
+ if (att && tiles.special_cid[scid_bulb].cid >= 0)
+  tiles.draw_cid (x * tiles.width, y * tiles.height, scid_bulb, tiles.special_cid, 0, att, false);
+
+ int sprnum = male? scid_npc : scid_npc_female;
+ if (tiles.special_cid[scid_npc_female].cid < 0 && tiles.special_cid[scid_npc].cid >= 0)
+    sprnum = scid_npc;
+ tiles.draw_cid (x * tiles.width, y * tiles.height, sprnum, tiles.special_cid, feature);
+ if (inv)
+    tiles.draw_cid (x * tiles.width, y * tiles.height, scid_select, tiles.special_cid);
+}
+#else
+
 void npc::draw(WINDOW* w, int ux, int uy, bool inv)
 {
  int x = getmaxx(w)/2 + posx - ux;
@@ -1809,6 +1837,7 @@ void npc::draw(WINDOW* w, int ux, int uy, bool inv)
  else
   mvwputch    (w, y, x, col, '@');
 }
+#endif
 
 void npc::print_info(WINDOW* w)
 {

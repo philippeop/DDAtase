@@ -58,6 +58,7 @@ player::player()
  in_vehicle = false;
  style_selected = itm_null;
  xp_pool = 0;
+ feature = gen_feature();
  last_item = itype_id(itm_null);
  for (int i = 0; i < num_skill_types; i++) {
   sklevel[i] = 0;
@@ -170,6 +171,7 @@ player& player::operator= (const player & rhs)
 
  morale = rhs.morale;
  xp_pool = rhs.xp_pool;
+ feature = rhs.feature;
 
  for (int i = 0; i < num_skill_types; i++) {
   sklevel[i]    = rhs.sklevel[i];
@@ -537,7 +539,7 @@ void player::load_info(game *g, std::string data)
          max_power_level >> hunger >> thirst >> fatigue >> stim >>
          pain >> pkill >> radiation >> cash >> recoil >> driving_recoil >>
          inveh >> scent >> moves >> underwater >> dodges_left >> blocks_left >>
-         oxygen >> active_mission >> xp_pool >> male >> health >> styletmp;
+         oxygen >> active_mission >> xp_pool >> male >> health >> feature >> styletmp;
 
  activity.load_info(dump);
  backlog.load_info(dump);
@@ -643,7 +645,7 @@ std::string player::save_info()
          (in_vehicle? 1 : 0) << " " << scent << " " << moves << " " <<
          underwater << " " << dodges_left << " " << blocks_left << " " <<
          oxygen << " " << active_mission << " " << xp_pool << " " << male <<
-         " " << health << " " << style_selected << " " << activity.save_info() <<
+         " " << health << " " << feature << " "<< style_selected << " " << activity.save_info() <<
 		 " " << backlog.save_info() << " ";
 
  for (int i = 0; i < PF_MAX2; i++)

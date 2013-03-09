@@ -255,6 +255,9 @@ class game
   WINDOW *w_status;
   overmap *om_hori, *om_vert, *om_diag; // Adjacent overmaps
 
+
+  void refresh_terrain(); // "use this instead of wrefresh(w_terrain)" // Gremous
+
  private:
 // Game-start procedures
   bool opening_screen();// Warn about screen size, then present the main menu
@@ -429,5 +432,9 @@ class game
 
   special_game *gamemode;
 };
+
+//TILES STUFF (in addition to refresh_terrain())
+void animation_delay(unsigned long nanosec);
+t_feature gen_feature();
 
 #endif

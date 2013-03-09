@@ -88,35 +88,81 @@ game::~game()
  delwin(w_status);
 }
 
-void game::init_ui(){
- clear();	// Clear the screen
- intro();	// Print an intro screen, make sure we're at least 80x25
+//TILES STUFF
+void animation_delay (unsigned long nanosec)
+{
+    timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = nanosec;
+    nanosleep (&ts, 0);
+#ifdef GFX_GL
+    gfx_refresh_screen ();
+#endif
+}
 
- VIEWX = OPTIONS[OPT_VIEWPORT_X];
- VIEWY = OPTIONS[OPT_VIEWPORT_Y];
- if (VIEWX <= 0) {
-  VIEWX = 1;
- }
- if (VIEWY <= 0) {
-  VIEWY = 1;
- }
- TERRAIN_WINDOW_WIDTH = (VIEWX * 2) + 1;
- TERRAIN_WINDOW_HEIGHT = (VIEWY * 2) + 1;
-// Set up the main UI windows.
- w_terrain = newwin(TERRAIN_WINDOW_HEIGHT, TERRAIN_WINDOW_WIDTH, 0, 0);
- werase(w_terrain);
- w_minimap = newwin(7, 7, 0, TERRAIN_WINDOW_WIDTH);
- werase(w_minimap);
- w_HP = newwin(14, 7, 7, TERRAIN_WINDOW_WIDTH);
- werase(w_HP);
- w_moninfo = newwin(12, 48, 0, VIEWX * 2 + 8);
- werase(w_moninfo);
- w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
- werase(w_messages);
- w_location = newwin(1, 48, 20, VIEWX * 2 + 8);
- werase(w_location);
- w_status = newwin(4, 55, 21, TERRAIN_WINDOW_WIDTH);
- werase(w_status);
+void game::refresh_terrain ()
+{
+#ifndef TILES
+    wrefresh (w_terrain);
+#endif
+}
+
+t_feature gen_feature ()
+{
+    return (t_feature) rand();
+}
+//TILES STUFF -END-
+
+void game::init_ui()
+{
+    clear();	// Clear the screen
+    intro();	// Print an intro screen, make sure we're at least 80x25
+
+    VIEWX = OPTIONS[OPT_VIEWPORT_X];
+    VIEWY = OPTIONS[OPT_VIEWPORT_Y];
+    if (VIEWX <= 0)
+    {
+        VIEWX = 1;
+    }
+    if (VIEWY <= 0)
+    {
+        VIEWY = 1;
+    }
+    TERRAIN_WINDOW_WIDTH = (VIEWX * 2) + 1;
+    TERRAIN_WINDOW_HEIGHT = (VIEWY * 2) + 1;
+    // Set up the main UI windows.
+#ifdef TILES
+    // Aw hell, we getting ncursey up in here!
+    w_terrain = newwin(SEEY * 2 + 1, SEEX * 2 + 1, 0, 0);
+    werase(w_terrain);
+    w_minimap = newwin(7, 7, 0, 0, tiles.width*(SEEX * 2 + 1), 0);
+    werase(w_minimap);
+    w_HP = newwin(14, 7, 7, 0, tiles.width*(SEEX * 2 + 1), 0);
+    werase(w_HP);
+    w_moninfo = newwin(12, 48, 0, 7, tiles.width*(SEEX * 2 + 1), 0);
+    werase(w_moninfo);
+    w_messages = newwin(9, 48, 12, 7, tiles.width*(SEEX * 2 + 1), 0);
+    werase(w_messages);
+    w_status = newwin(4, 55, 21, 0, tiles.width*(SEEX * 2 + 1), 0);
+    werase(w_status);
+
+    tiles.init(this);
+#else
+    w_terrain = newwin(TERRAIN_WINDOW_HEIGHT, TERRAIN_WINDOW_WIDTH, 0, 0);
+    werase(w_terrain);
+    w_minimap = newwin(7, 7, 0, TERRAIN_WINDOW_WIDTH);
+    werase(w_minimap);
+    w_HP = newwin(14, 7, 7, TERRAIN_WINDOW_WIDTH);
+    werase(w_HP);
+    w_moninfo = newwin(12, 48, 0, VIEWX * 2 + 8);
+    werase(w_moninfo);
+    w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
+    werase(w_messages);
+    w_location = newwin(1, 48, 20, VIEWX * 2 + 8);
+    werase(w_location);
+    w_status = newwin(4, 55, 21, TERRAIN_WINDOW_WIDTH);
+    werase(w_status);
+#endif
 }
 
 void game::setup()
@@ -1833,6 +1879,7 @@ bool game::handle_action()
   } else {
   add_msg("Saving in vehicles is buggy, stop and get out of the vehicle first");
  } break;
+
   case ACTION_QUIT:
    if (query_yn("Commit suicide?")) {
     u.moves = 0;
@@ -2827,7 +2874,9 @@ void game::list_missions()
 void game::draw()
 {
  // Draw map
- werase(w_terrain);
+ #ifndef TILES
+    werase(w_terrain);
+ #endif
  draw_ter();
  draw_footsteps();
  mon_info();
@@ -2907,8 +2956,13 @@ void game::draw_ter(int posx, int posy)
    z[i].draw(w_terrain, posx, posy, false);
   else if (z[i].has_flag(MF_WARM) && distx <= VIEWX && disty <= VIEWY &&
            (u.has_active_bionic(bio_infrared) || u.has_trait(PF_INFRARED)))
-   mvwputch(w_terrain, VIEWY + z[i].posy - posy, VIEWX + z[i].posx - posx,
-            c_red, '?');
+
+#ifdef TILES
+   tiles.draw_cid ((SEEX + z[i].posx - u.posx) * tiles.width, (SEEY + z[i].posy - u.posy) * tiles.height,
+                   z[i].type->id, tiles.monster_cid, 0, 0xff2020, true);  // TODO: feature
+#else
+   mvwputch(w_terrain, VIEWY + z[i].posy - posy, VIEWX + z[i].posx - posx, c_red, '?');
+#endif
  }
  // Draw NPCs
  for (int i = 0; i < active_npc.size(); i++) {
@@ -3121,9 +3175,14 @@ void game::hallucinate(const int x, const int y)
  for (int i = 0; i <= TERRAIN_WINDOW_WIDTH; i++) {
   for (int j = 0; j <= TERRAIN_WINDOW_HEIGHT; j++) {
    if (one_in(10)) {
+#ifdef TILES
+    tiles.draw_cid (i*tiles.width, j*tiles.height, m.ter(i + rng(-2, 2), j + rng(-2, 2)),
+                    tiles.terrain_cid, gen_feature());
+#else
     char ter_sym = terlist[m.ter(i + x - VIEWX + rng(-2, 2), j + y - VIEWY + rng(-2, 2))].sym;
     nc_color ter_col = terlist[m.ter(i + x - VIEWX + rng(-2, 2), j + y - VIEWY+ rng(-2, 2))].color;
     mvwputch(w_terrain, j, i, ter_col, ter_sym);
+#endif
    }
   }
  }
@@ -3866,9 +3925,9 @@ void game::draw_footsteps()
 
 void game::explosion(int x, int y, int power, int shrapnel, bool fire)
 {
- timespec ts;	// Timespec for the animation of the explosion
- ts.tv_sec = 0;
- ts.tv_nsec = EXPLOSION_SPEED;
+ //timespec ts;	// Timespec for the animation of the explosion
+ //ts.tv_sec = 0;
+ //ts.tv_nsec = EXPLOSION_SPEED;
  int radius = sqrt(double(power / 4));
  int dam;
  std::string junk;
@@ -3955,7 +4014,8 @@ void game::explosion(int x, int y, int power, int shrapnel, bool fire)
                        x + i + VIEWX - u.posx - u.view_offset_x, c_red,'|');
   }
   wrefresh(w_terrain);
-  nanosleep(&ts, NULL);
+  //animation_delay(EXPLOSION_SPEED);
+  //nanosleep(&ts, NULL);
  }
 
 // The rest of the function is shrapnel
@@ -3963,8 +4023,8 @@ void game::explosion(int x, int y, int power, int shrapnel, bool fire)
   return;
  int sx, sy, t, ijunk, tx, ty;
  std::vector<point> traj;
- ts.tv_sec = 0;
- ts.tv_nsec = BULLET_SPEED;	// Reset for animation of bullets
+ //ts.tv_sec = 0;
+ //ts.tv_nsec = BULLET_SPEED;	// Reset for animation of bullets
  for (int i = 0; i < shrapnel; i++) {
   sx = rng(x - 2 * radius, x + 2 * radius);
   sy = rng(y - 2 * radius, y + 2 * radius);
@@ -3980,7 +4040,8 @@ void game::explosion(int x, int y, int power, int shrapnel, bool fire)
     mvwputch(w_terrain, traj[j].y + VIEWY - u.posy - u.view_offset_y,
                         traj[j].x + VIEWX - u.posx - u.view_offset_x, c_red, '`');
     wrefresh(w_terrain);
-    nanosleep(&ts, NULL);
+    //animation_delay(BULLET_SPEED);
+    //nanosleep(&ts, NULL);
    }
    tx = traj[j].x;
    ty = traj[j].y;
@@ -4135,6 +4196,7 @@ void game::scrambler_blast(int x, int y)
    add_msg("The %s sparks and begins searching for a target!", z[mondex].name().c_str());
  }
 }
+
 void game::emp_blast(int x, int y)
 {
  int rn;
@@ -4695,8 +4757,8 @@ static void open_gate( game *g, const int examx, const int examy, const enum ter
 
  switch(handle_type) {
  case t_gates_mech_control:
-  v_wall_type = t_wall_v;
-  h_wall_type = t_wall_h;
+  v_wall_type = t_wall;
+  h_wall_type = t_wall;
   door_type   = t_door_metal_locked;
   floor_type  = t_floor;
   pull_message = "You turn the handle...";
@@ -5430,7 +5492,11 @@ point game::look_around()
  int lx = u.posx + u.view_offset_x, ly = u.posy + u.view_offset_y;
  int mx, my, junk;
  InputEvent input;
+#ifdef TILES
+ WINDOW* w_look = newwin(13, 48, 12, 7, tiles.width*(SEEX*2+1), 0);
+#else
  WINDOW* w_look = newwin(13, 48, 12, VIEWX * 2 + 8);
+#endif
  wborder(w_look, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
                  LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
  mvwprintz(w_look, 1, 1, c_white, "Looking Around");
@@ -5919,8 +5985,13 @@ void game::pickup(int posx, int posy, int min)
   return;
  }
 // Otherwise, we have 2 or more items and should list them, etc.
+#ifdef TILES
+ WINDOW* w_pickup = newwin(12, 48, 0, 7, tiles.width*(SEEX*2+1));
+ WINDOW* w_item_info = newwin(12, 48, 12, 7, tiles.width*(SEEX*2+1));
+#else
  WINDOW* w_pickup = newwin(12, 48, 0, VIEWX * 2 + 8);
  WINDOW* w_item_info = newwin(12, 48, 12, VIEWX * 2 + 8);
+#endif
  int maxitems = 9;	 // Number of items to show at one time.
  std::vector <item> here = from_veh? veh->parts[veh_part].items : m.i_at(posx, posy);
  bool getitem[here.size()];
@@ -7775,10 +7846,11 @@ void game::fling_player_or_monster(player *p, monster *zz, int dir, int flvel)
             break;
         range--;
         steps++;
-        timespec ts;   // Timespec for the animation
-        ts.tv_sec = 0;
-        ts.tv_nsec = BILLION / 20;
-        nanosleep (&ts, 0);
+        //timespec ts;   // Timespec for the animation
+        //ts.tv_sec = 0;
+        //ts.tv_nsec = BILLION / 20;
+        //nanosleep (&ts, 0);
+        //animation_delay(BILLION / 20);
     }
 
     if (!m.has_flag(swimmable, x, y))

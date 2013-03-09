@@ -289,9 +289,9 @@ void computer::activate_function(game *g, computer_action action)
      int mondex = g->mon_at(x, y);
      if (mondex != -1 &&
          ((g->m.ter(x, y - 1) == t_reinforced_glass_h &&
-           g->m.ter(x, y + 1) == t_wall_h) ||
+           g->m.ter(x, y + 1) == t_wall) ||
           (g->m.ter(x, y + 1) == t_reinforced_glass_h &&
-           g->m.ter(x, y - 1) == t_wall_h)))
+           g->m.ter(x, y - 1) == t_wall)))
       g->kill_mon(mondex, true);
     }
    }
@@ -643,7 +643,7 @@ of pureed bone & LSD.");
     }
    }
    break;
-   
+
   case COMPACT_EMERG_MESS:
   print_line("\
   GREETINGS CITIZEN. A BIOLOGICAL ATTACK HAS TAKEN PLACE AND A STATE OF \n\
@@ -807,7 +807,7 @@ void computer::activate_failure(game *g, computer_failure fail)
    }
    getch();
    break;
-   
+
  }// switch (fail)
 }
 

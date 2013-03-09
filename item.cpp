@@ -27,6 +27,7 @@ item::item()
  owned = -1;
  mission_id = -1;
  player_id = -1;
+ feature = gen_feature();
 }
 
 item::item(itype* it, unsigned int turn)
@@ -48,6 +49,7 @@ item::item(itype* it, unsigned int turn)
  owned = -1;
  mission_id = -1;
  player_id = -1;
+ feature = gen_feature();
  if (it == NULL)
   return;
  if (it->is_gun())
@@ -255,7 +257,7 @@ std::string item::save_info()
  if (ammotmp < 0 || ammotmp > num_items)
   ammotmp = 0; // Saves us from some bugs
  std::stringstream dump;// (std::stringstream::in | std::stringstream::out);
- dump << " " << int(invlet) << " " << int(typeId()) << " " <<  int(charges) <<
+ dump << " " << int(invlet) << " " << int(typeId()) << " " <<  feature << " " << int(charges) <<
          " " << int(damage) << " " << int(burnt) << " " << poison << " " <<
          ammotmp << " " << owned << " " << int(bday);
  if (active)
@@ -281,7 +283,7 @@ void item::load_info(std::string data, game *g)
  std::stringstream dump;
  dump << data;
  int idtmp, ammotmp, lettmp, damtmp, burntmp, acttmp, corp;
- dump >> lettmp >> idtmp >> charges >> damtmp >> burntmp >> poison >> ammotmp >>
+ dump >> lettmp >> idtmp >> feature >> charges >> damtmp >> burntmp >> poison >> ammotmp >>
          owned >> bday >> acttmp >> corp >> mission_id >> player_id;
  if (corp != -1)
   corpse = g->mtypes[corp];
