@@ -6,9 +6,11 @@
     #define GL_GLEXT_PROTOTYPES
     #include <GL/glx.h> // includes gl, glext
     #include <X11/keysym.h>
-#elif (defined _WIN32 || defined WINDOWS)
+#else
+#if (defined _WIN32 || defined WINDOWS)
     #include <GL/gl.h>
     #include "GL/glext.h"
+#endif
 #endif
 
 #include <stdio.h>

@@ -16,6 +16,9 @@
     #endif
 #endif
 
-class TerminationException {};
-
 #endif // CURSES_DEF_H
+
+#ifndef _TERM_EXCEPTION_
+#define _TERM_EXCEPTION_
+class TerminationException { };
+#endif

@@ -22,7 +22,9 @@
 # DEBUG is best turned on if you plan to debug in gdb -- please do!
 # PROFILE is for use with gprof or a similar program -- don't bother generally
 #WARNINGS = -Wall -Wextra -Wno-switch -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter -Wno-char-subscripts
-DEBUG = -g
+# This -w suppresses warnings
+WARNINGS = -w
+DEBUG = -ggdb
 #PROFILE = -pg
 #OTHERS = -O3
 #DEFINES = -DNDEBUG
@@ -64,7 +66,7 @@ ifdef RELEASE
   DEBUG =
 endif
 
-CXXFLAGS = $(WARNINGS) $(DEBUG) $(PROFILE) $(OTHERS) -MMD -w
+CXXFLAGS = $(WARNINGS) $(DEBUG) $(PROFILE) $(OTHERS) -MMD
 
 BINDIST_EXTRAS = README data cataclysm-launcher
 BINDIST    = cataclysmdda-$(VERSION).tar.gz
@@ -116,14 +118,15 @@ all: $(TARGET)
 	@
 
 $(TARGET): $(ODIR) $(DDIR) $(OBJS)
-	$(CXX) $(W32FLAGS) -o $(TARGET) $(DEFINES) $(CXXFLAGS) \
+	$(CXX) $(CXXFLAGS) $(W32FLAGS) -o $(TARGET) $(DEFINES) \
           $(OBJS) $(LDFLAGS)
 
 tiles: $(TARGET_TILES)
 	@
 
 $(TARGET_TILES): $(ODIRT) $(DDIRT) $(OBJST)
-	$(CXX) $(W32FLAGS) -o $(TARGET_TILES) $(CXXFLAGS) $(OBJST) $(LDFLAGS) -L/lib -lgl -lglu -lglut -lopengl32 -lglut32 -lglu32
+	$(CXX) $(CXXFLAGS) $(W32FLAGS) -o $(TARGET_TILES) $(DEFINES) \
+          $(OBJST) $(LDFLAGS) -lGL
 
 $(ODIR):
 	mkdir $(ODIR)
@@ -141,7 +144,7 @@ $(DDIRT):
 	@mkdir $(DDIRT)
 
 $(ODIRT)/%.o: %.cpp
-	$(CXX) $(CFLAGS) -DTILES -c $< -o $@
+	$(CXX) $(DEFINES) $(CXXFLAGS) -DTILES -c $< -o $@
 
 clean:
 	rm -f $(TARGET) $(W32TARGET) $(ODIR)/*.o $(ODIR)/*.d $(W32ODIR)/*.o $(W32BINDIST) \
