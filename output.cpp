@@ -685,6 +685,7 @@ void full_screen_popup(const char* mes, ...)
  vsprintf(buff, mes, ap);
  va_end(ap);
  std::string tmp = buff;
+ //clear();
  WINDOW* w = newwin(25, 80, 0, 0);
  wborder(w, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
             LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );

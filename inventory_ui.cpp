@@ -113,6 +113,7 @@ std::vector<int> find_firsts(inventory &inv)
 // Display current inventory.
 char game::inv(std::string title)
 {
+ //clear();
  WINDOW* w_inv = newwin(((VIEWY < 12) ? 25 : VIEWY*2+1), ((VIEWX < 12) ? 80 : VIEWX*2+56), 0, 0);
  const int maxitems = (VIEWY < 12) ? 20 : VIEWY*2-4;    // Number of items to show at one time.
  char ch = '.';
@@ -304,6 +305,7 @@ std::vector<item> game::multidrop()
 {
  u.sort_inv();
  u.inv.restack(&u);
+ //clear();
  WINDOW* w_inv = newwin(((VIEWY < 12) ? 25 : VIEWY*2+1), ((VIEWX < 12) ? 80 : VIEWX*2+56), 0, 0);
  const int maxitems = (VIEWY < 12) ? 20 : VIEWY*2-4;    // Number of items to show at one time.
  int dropping[u.inv.size()]; // Count of how many we'll drop from each stack

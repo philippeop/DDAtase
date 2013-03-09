@@ -103,6 +103,7 @@ void npc::talk_to_u(game *g)
  moves -= 100;
  decide_needs();
 
+ //clear();
  d.win = newwin(25, 80, 0, 0);
  wborder(d.win, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
                 LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
@@ -1680,6 +1681,7 @@ talk_topic special_talk(char ch)
 
 bool trade(game *g, npc *p, int cost, std::string deal)
 {
+ //clear();
  WINDOW* w_head = newwin( 4, 80,  0,  0);
  WINDOW* w_them = newwin(21, 40,  4,  0);
  WINDOW* w_you  = newwin(21, 40,  4, 40);

@@ -282,7 +282,7 @@ void game::fire(player &p, int tarx, int tary, std::vector<point> &trajectory,
                     (trajectory[i].y + SEEY - u.posy) * tiles.height,
                     bullet == '#'? scid_flame : scid_bullet, tiles.special_cid);
 #else
-    mvwputch(w_terrain, trajectory[i].y + VIEWY - u.posy,
+    m.putch(w_terrain, trajectory[i].y + VIEWY - u.posy,
                         trajectory[i].x + VIEWX - u.posx, c_red, bullet);
 #endif
     if (&p == &u)
@@ -608,7 +608,7 @@ std::vector<point> game::target(int &x, int &y, int lowx, int lowy, int hix,
 // Draw the player
    int atx = VIEWX + u.posx - center.x, aty = VIEWY + u.posy - center.y;
    if (atx >= 0 && atx < TERRAIN_WINDOW_WIDTH && aty >= 0 && aty < TERRAIN_WINDOW_HEIGHT)
-    mvwputch(w_terrain, aty, atx, u.color(), '@');
+    m.draw_player(w_terrain, u);
 
    if (m.sees(u.posx, u.posy, x, y, -1, tart)) {// Selects a valid line-of-sight
     ret = line_to(u.posx, u.posy, x, y, tart); // Sets the vector to that LOS
@@ -649,15 +649,15 @@ std::vector<point> game::target(int &x, int &y, int lowx, int lowy, int hix,
         tiles.draw_cid ((x + SEEX - u.posx) * tiles.width, (y + SEEY - u.posy) * tiles.height, scid_aim, tiles.special_cid);
 #else
     if (snap_to_target)
-     mvwputch(w_terrain, VIEWY, VIEWX, c_red, '*');
+     m.putch(w_terrain, VIEWY, VIEWX, c_red, '*');
     else
-     mvwputch(w_terrain, y + VIEWY - u.posy, x + VIEWX - u.posx, c_red, '*');
+     m.putch(w_terrain, y + VIEWY - u.posy, x + VIEWX - u.posx, c_red, '*');
 #endif
    } else if (u_see(&(z[mon_at(x, y)]), tart))
     z[mon_at(x, y)].print_info(this, w_target);
   }
   wrefresh(w_target);
-  wrefresh(w_terrain);
+  refresh_terrain();
   wrefresh(w_status);
   refresh();
   ch = input();
@@ -671,7 +671,7 @@ std::vector<point> game::target(int &x, int &y, int lowx, int lowy, int hix,
    else if (m.sees(u.posx, u.posy, x, y, -1, junk))
     m.drawsq(w_terrain, u, x, y, false, true, center.x, center.y);
    else
-    mvwputch(w_terrain, VIEWY, VIEWX, c_black, 'X');
+    m.putch(w_terrain, VIEWY, VIEWX, c_black, 'X');
    x += tarx;
    y += tary;
    if (x < lowx)

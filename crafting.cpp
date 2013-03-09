@@ -1088,6 +1088,7 @@ void game::craft()
   add_msg("Your morale is too low to craft...");
   return;
  }
+ //clear();
  WINDOW *w_head = newwin( 3, 80, 0, 0);
  WINDOW *w_data = newwin(22, 80, 3, 0);
  craft_cat tab = CC_WEAPON;

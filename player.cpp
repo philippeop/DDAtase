@@ -1579,6 +1579,7 @@ encumb(bp_feet) * 5);
 
 void player::disp_morale()
 {
+ //clear();
  WINDOW *w = newwin(25, 80, 0, 0);
  wborder(w, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
             LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
@@ -1876,6 +1877,7 @@ void player::charge_power(int amount)
 
 void player::power_bionics(game *g)
 {
+ //clear();
  WINDOW *wBio = newwin(25, 80, 0, 0);
  werase(wBio);
  std::vector <bionic> passive;

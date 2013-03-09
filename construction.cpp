@@ -249,6 +249,7 @@ void game::init_construction()
 
 void game::construction_menu()
 {
+ //clear();
  WINDOW *w_con = newwin(25, 80, 0, 0);
  wborder(w_con, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
                 LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
@@ -545,7 +546,7 @@ void game::place_construction(constructable *con)
     if (max_stage >= starting_stage) {
      valid.push_back(point(x, y));
      m.drawsq(w_terrain, u, x, y, true, false);
-     wrefresh(w_terrain);
+     refresh_terrain();
     }
    }
   }

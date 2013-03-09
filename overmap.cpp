@@ -264,6 +264,7 @@ void overmap::delete_note(int x, int y)
 point overmap::display_notes()
 {
  std::string title = "Notes:";
+ //clear();
  WINDOW* w_notes = newwin(25, 80, 0, 0);
  const int maxitems = 20;	// Number of items to show at one time.
  char ch = '.';
@@ -1079,6 +1080,7 @@ void overmap::draw(WINDOW *w, game *g, int &cursx, int &cursy,
 
 point overmap::choose_point(game *g)
 {
+ //clear();
  WINDOW* w_map = newwin(g->TERRAIN_WINDOW_HEIGHT, g->TERRAIN_WINDOW_WIDTH + 55, 0, 0);
  WINDOW* w_search = newwin(13, 27, 3, g->TERRAIN_WINDOW_WIDTH + 1);
  timeout(BLINK_SPEED);	// Enable blinking!

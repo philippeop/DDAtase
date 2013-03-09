@@ -7,6 +7,7 @@
 
 void game::wish()
 {
+ //clear();
  WINDOW* w_list = newwin(25, 30, 0,  0);
  WINDOW* w_info = newwin(25, 50, 0, 30);
  int a = 0, shift = 0, result_selected = 0;
@@ -167,6 +168,7 @@ void game::wish()
 
 void game::monster_wish()
 {
+ //clear();
  WINDOW* w_list = newwin(25, 30, 0,  0);
  WINDOW* w_info = newwin(25, 50, 0, 30);
  int a = 0, shift = 1, result_selected = 0;
@@ -314,6 +316,7 @@ void game::monster_wish()
 
 void game::mutation_wish()
 {
+ //clear();
  WINDOW* w_list = newwin(25, 30, 0,  0);
  WINDOW* w_info = newwin(25, 50, 0, 30);
  int a = 0, shift = 0, result_selected = 0;
