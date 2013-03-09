@@ -1,5 +1,9 @@
 #ifndef __CATACURSE__
 #define __CATACURSE__
+
+#if !(defined TILES || defined GFX_GL)
+#if (defined _WIN32 || defined WINDOWS)
+
 #define _WIN32_WINNT 0x0500
 #define WIN32_LEAN_AND_MEAN
 //#define VC_EXTRALEAN
@@ -151,4 +155,8 @@ bool WinCreate(bool initgl);
 void CheckMessages();
 int FindWin(WINDOW *wnd);
 LRESULT CALLBACK ProcessMessages(HWND__ *hWnd,u_int32_t Msg,WPARAM wParam, LPARAM lParam);
+
 #endif
+#endif
+#endif
+

@@ -7,6 +7,7 @@
 #include "options.h"
 #include "mapbuffer.h"
 #include <cmath>
+#include <algorithm>
 #include <stdlib.h>
 #include <fstream>
 #include "debug.h"

@@ -1,4 +1,4 @@
-/*#ifndef _CATACURSES_H_
+#ifndef _CATACURSES_H_
 #define _CATACURSES_H_
 
 #if (defined TILES || defined GFX_GL)
@@ -14,8 +14,9 @@
     #endif
 #endif
 
-class TerminationException
-{
-};
+#endif
 
-#endif*/
+#ifndef _TERM_EXCEPTION_
+#define _TERM_EXCEPTION_
+class TerminationException { };
+#endif
