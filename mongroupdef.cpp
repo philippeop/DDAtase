@@ -18,6 +18,12 @@ void game::init_moncats()
 	mon_graboid, mon_worm, mon_halfworm, NULL);
  setvector(
    moncats[mcat_zombie],
+   // Regular zombie listed twice to get around the max frequency of 255
+     mon_zombie, mon_zombie, mon_zombie_cop, mon_zombie_shrieker,
+     mon_zombie_spitter, mon_zombie_fast,
+  	  mon_zombie_electric, mon_zombie_brute, mon_zombie_hulk,
+	    mon_zombie_necro, mon_boomer, mon_skeleton, mon_zombie_grabber,
+     mon_zombie_master, mon_crow, NULL);
 	mon_dog, mon_cat, mon_zombie, mon_zombie_cop, mon_zombie_fast,
 	mon_zombie_brute, mon_skeleton, mon_crow, NULL); //Oddzball-No goofy Zombie types spawning
  setvector(

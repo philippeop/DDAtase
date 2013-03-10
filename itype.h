@@ -44,7 +44,7 @@ itm_water, itm_water_clean, itm_sewage, itm_salt_water, itm_oj, itm_apple_cider,
  itm_long_island, itm_beer, itm_bleach,
  itm_ammonia, itm_mutagen, itm_purifier, itm_tea, itm_coffee, itm_blood,
 // Monster Meats
-itm_meat, itm_veggy, itm_human_flesh, itm_veggy_wild, itm_meat_tainted, itm_veggy_tainted,
+itm_bone, itm_plant_sac, itm_meat, itm_veggy, itm_human_flesh, itm_veggy_wild, itm_meat_tainted, itm_veggy_tainted,
 itm_meat_cooked, itm_veggy_cooked, itm_veggy_wild_cooked,
 // Food
 itm_apple, itm_orange, itm_lemon, itm_chips, itm_chips2, itm_chips3,
@@ -69,7 +69,8 @@ itm_bandages, itm_1st_aid, itm_vitamins, itm_aspirin, itm_caffeine,
 itm_wrapper, itm_withered, itm_syringe, itm_fur, itm_leather, itm_superglue,
  itm_id_science, itm_id_military, itm_electrohack, itm_string_6, itm_string_36,
  itm_rope_6, itm_rope_30, itm_chain, itm_processor, itm_RAM, itm_power_supply,
- itm_amplifier, itm_transponder, itm_receiver, itm_antenna, itm_steel_chunk,
+ itm_amplifier, itm_transponder, itm_receiver, itm_burnt_out_bionic,
+ itm_antenna, itm_steel_chunk,
  itm_steel_lump, itm_scrap, itm_hose, itm_glass_sheet, itm_manhole_cover, itm_rock,
  itm_stick, itm_broom,
  itm_hammer_sledge, itm_hatchet, itm_nailboard, itm_nailbat,
@@ -87,6 +88,7 @@ itm_wrapper, itm_withered, itm_syringe, itm_fur, itm_leather, itm_superglue,
  itm_fan, itm_ceramic_plate, itm_ceramic_bowl, itm_ceramic_cup,
  itm_glass_plate, itm_glass_bowl, itm_glass, itm_tin_plate, itm_fork, itm_spork,
  itm_foon, itm_rag_bloody, itm_clock, itm_clockworks,
+ itm_javelin,
 // Vehicle parts
  itm_frame,
  itm_wheel, itm_wheel_wide, itm_wheel_bicycle, itm_wheel_motorbike, itm_wheel_small,
@@ -101,7 +103,7 @@ itm_wrapper, itm_withered, itm_syringe, itm_fur, itm_leather, itm_superglue,
  itm_sneakers, itm_boots, itm_boots_steel, itm_boots_winter, itm_mocassins,
  itm_flip_flops, itm_dress_shoes, itm_heels,
  itm_sneakers_fit, itm_boots_fit, itm_boots_steel_fit, itm_boots_winter_fit,
- itm_dress_shoes_fit, itm_heels_fit,
+ itm_dress_shoes_fit, itm_heels_fit, itm_boots_chitin,
 // Legwear
  itm_shorts, itm_shorts_cargo,
  itm_jeans, itm_pants, itm_pants_leather, itm_pants_cargo, itm_pants_army, itm_pants_ski,
@@ -122,7 +124,7 @@ itm_armguard_soft, itm_armguard_hard, itm_armguard_chitin, itm_armguard_metal,
 // Gloves
 itm_gloves_liner, itm_gloves_light, itm_mittens, itm_gloves_wool, itm_gloves_winter,
  itm_gloves_leather, itm_gloves_fingerless, itm_gloves_rubber,
- itm_gloves_medical, itm_fire_gauntlets,
+ itm_gloves_medical, itm_fire_gauntlets, itm_gauntlets_chitin,
 // Masks
 itm_mask_dust, itm_bandana, itm_scarf, itm_mask_filter, itm_mask_gas,
 // Eyewear
@@ -134,10 +136,11 @@ itm_hat_ball, itm_hat_boonie, itm_hat_cotton, itm_hat_knit, itm_hat_hunting, itm
  itm_helmet_motor, itm_helmet_chitin, itm_helmet_plate, itm_tophat,
 // High-storage
 itm_backpack, itm_rucksack, itm_purse, itm_mbag, itm_fanny, itm_holster, itm_bootstrap,
+itm_ragpouch, itm_leather_pouch,
 // Decorative
 itm_ring, itm_necklace,
 // Ammunition
- itm_battery, itm_thread,  itm_duct_tape, itm_cable, itm_plut_cell,
+ itm_battery, itm_thread, itm_sinew, itm_plant_fibre, itm_duct_tape, itm_cable, itm_plut_cell,
  itm_nail, itm_bb, itm_arrow_wood, itm_arrow_cf,
  itm_bolt_wood, itm_bolt_steel, itm_shot_bird, itm_shot_00, itm_shot_slug,
  itm_shot_he, itm_22_lr, itm_22_cb, itm_22_ratshot, itm_9mm, itm_9mmP,
@@ -188,7 +191,7 @@ itm_silencer, itm_grip, itm_barrel_big, itm_barrel_small, itm_barrel_rifled,
 // Containers
 itm_bag_plastic, itm_bottle_plastic, itm_bottle_glass,
  itm_can_drink, itm_can_food, itm_box_small,
- itm_canteen, itm_jerrycan, itm_carboy_plastic, itm_flask_glass,
+ itm_canteen, itm_jerrycan, itm_carboy_plastic, itm_flask_glass, itm_waterskin,
 // Tools
 itm_lighter, itm_sewing_kit, itm_scissors, itm_hammer, itm_extinguisher,
  itm_flashlight, itm_flashlight_on, itm_hotplate, itm_soldering_iron,
@@ -211,7 +214,8 @@ itm_lighter, itm_sewing_kit, itm_scissors, itm_hammer, itm_extinguisher,
  itm_tent_kit, itm_torch, itm_torch_lit, itm_candle, itm_candle_lit,
  itm_brazier, itm_puller, itm_press, itm_screwdriver, itm_wrench,
  itm_boltcutters, itm_mop, itm_picklocks, itm_pickaxe, itm_spray_can, itm_rag,
- itm_pda, itm_pda_flashlight, itm_pockknife,
+ itm_pda, itm_pda_flashlight, itm_pockknife, itm_needle_bone,
+ itm_primitive_hammer, itm_primitive_axe, itm_primitive_shovel,
 // Bionics containers
 itm_bionics_battery,
  //power sources

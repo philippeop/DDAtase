@@ -860,6 +860,7 @@ void iuse::scissors(game *g, player *p, item *it, bool t)
   else
    p->i_add(rag, g);
   }
+  return;
  }
  if (cut->made_of(LEATHER)) {
  p->moves -= 25 * cut->volume();
@@ -1219,7 +1220,14 @@ void iuse::picklock(game *g, player *p, item *it, bool t)
  } else if (dice(4, 4) < dice(2, p->skillLevel("mechanics").level()) +
                          dice(2, p->dex_cur) - it->damage / 2 && it->damage < 100) {
   it->damage++;
-  g->add_msg_if_player(p,"The lock stumps your efforts to pick it, and you damage your tool.");
+
+  std::string sStatus = "damage";
+  if (it->damage >= 5) {
+   sStatus = "destroy";
+   p->i_rem(it->invlet);
+  }
+
+  g->add_msg_if_player(p,("The lock stumps your efforts to pick it, and you " + sStatus + " your tool.").c_str());
  } else {
   g->add_msg_if_player(p,"The lock stumps your efforts to pick it.");
  }
@@ -2414,6 +2422,7 @@ if (cut->made_of(COTTON)) {
   else
    p->i_add(rag);
   }
+  break;
  }
  if (cut->made_of(LEATHER)) {
  p->moves -= 25 * cut->volume();
