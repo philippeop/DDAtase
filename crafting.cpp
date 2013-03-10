@@ -89,7 +89,7 @@ RECIPE(itm_tank_top, CC_NONCRAFT, "tailor", NULL, 0, 500, true);
 
  RECIPE(itm_arrow_wood, CC_WEAPON, "archery", "survival", 1, 5000, false);
   TOOL(itm_hatchet, -1, itm_knife_steak, -1, itm_knife_butcher, -1,
-       itm_knife_combat, -1, itm_machete, -1, itm_toolset, -1, NULL);
+       itm_knife_combat, -1, itm_machete, -1, itm_pockknife, -1, itm_toolset, -1, NULL);
   COMP(itm_stick, 1, itm_broom, 1, itm_mop, 1, itm_2x4, 1, itm_bee_sting, 1,
        NULL);
 
@@ -1224,7 +1224,7 @@ void game::craft()
     mvwprintz(w_data, 3, 30, col, "Your skill level: N/A");
    else
     mvwprintz(w_data, 3, 30, col, "Your skill level: %d",
-              u.skillLevel(current[line]->sk_primary).level());
+              u.skillLevel(current[line]->sk_primary));
    if (current[line]->time >= 1000)
     mvwprintz(w_data, 4, 30, col, "Time to complete: %d minutes",
               int(current[line]->time / 1000));
@@ -1519,11 +1519,11 @@ void game::complete_craft()
  recipe* making = recipes[u.activity.index]; // Which recipe is it?
 
 // # of dice is 75% primary skill, 25% secondary (unless secondary is null)
- int skill_dice = u.skillLevel(making->sk_primary).level() * 3;
+ int skill_dice = u.skillLevel(making->sk_primary) * 3;
  if (making->sk_secondary == NULL)
-   skill_dice += u.skillLevel(making->sk_primary).level();
+   skill_dice += u.skillLevel(making->sk_primary);
  else
-   skill_dice += u.skillLevel(making->sk_secondary).level();
+   skill_dice += u.skillLevel(making->sk_secondary);
 // Sides on dice is 16 plus your current intelligence
  int skill_sides = 16 + u.int_cur;
 
@@ -1917,11 +1917,11 @@ void game::complete_disassemble()
 
   // adapting original crafting formula to check if disassembly was successful
   // # of dice is 75% primary skill, 25% secondary (unless secondary is null)
-  int skill_dice = 2 + u.skillLevel(dis->sk_primary).level() * 3;
+  int skill_dice = 2 + u.skillLevel(dis->sk_primary) * 3;
    if (dis->sk_secondary == NULL)
-     skill_dice += u.skillLevel(dis->sk_primary).level();
+     skill_dice += u.skillLevel(dis->sk_primary);
    else
-     skill_dice += u.skillLevel(dis->sk_secondary).level();
+     skill_dice += u.skillLevel(dis->sk_secondary);
   // Sides on dice is 16 plus your current intelligence
    int skill_sides = 16 + u.int_cur;
 
