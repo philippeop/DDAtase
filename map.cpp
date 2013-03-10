@@ -884,7 +884,7 @@ bool map::is_ter_connects (ter_id t, ter_id t2)
     }
     if (t == t2)
         return true;
-    if (t == t_wall || t == t_wall_metal)
+    if (t == t_wall_h || t == t_wall_v || t == t_wall_metal_h || t == t_wall_metal_v)
     {
         if (terlist[t2].movecost == 0)
             return true;
@@ -894,7 +894,7 @@ bool map::is_ter_connects (ter_id t, ter_id t2)
                 return true;
     }
     else
-    if (t2 == t_wall || t2 == t_wall_metal)
+    if (t2 == t_wall_h || t2 == t_wall_v || t2 == t_wall_metal_h || t2 == t_wall_metal_v)
     {
         int i = 0;
         while (ter_omni_connect[i] != t_null)
@@ -1706,7 +1706,8 @@ void map::destroy(game *g, const int x, const int y, const bool makesound)
 
  case t_concrete_v:
  case t_concrete_h:
- case t_wall:
+ case t_wall_v:
+ case t_wall_h:
  g->sound(x, y, 20, "SMASH!!");
   for (int i = x - 2; i <= x + 2; i++) {
    for (int j = y - 2; j <= y + 2; j++) {
@@ -2517,7 +2518,7 @@ void map::draw(game *g, WINDOW* w, const point center)
 #ifdef TILES
     // clear the terrain window
     gfx_set_color_argb (0xff000000);
-    gfx_draw_rectangle(0, 0, (SEEX * 2 + 1) * tiles.width, (SEEY * 2 + 1) * tiles.height);
+    gfx_draw_rectangle(0, 0, (SEEX * my_MAPSIZE) * tiles.width, (SEEY * my_MAPSIZE) * tiles.height);
 #endif
  g->reset_light_level();
  const int natural_sight_range = g->u.sight_range(1);
@@ -2595,10 +2596,8 @@ void map::draw(game *g, WINDOW* w, const point center)
     else
          mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_dkgray, '#');
    } else if (dist > light_sight_range && u_sight_impaired && lit == LL_BRIGHT) {
-    if (u_is_boomered)
-     mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_pink, '#');
-    else
-     mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_ltgray, '#');
+    draw_fog (w, g->u, realx+SEEX - g->u.posx, realy+SEEY - g->u.posy, 
+	         g->u.has_disease(DI_BOOMERED)? c_magenta : c_dkgray);
    } else if (dist <= u_clairvoyance || can_see) {
     drawsq(w, g->u, realx, realy, false, true, center.x, center.y,
            (dist > lowlight_sight_range && LL_LIT > lit) ||
@@ -2611,14 +2610,14 @@ void map::draw(game *g, WINDOW* w, const point center)
  }
  int atx = getmaxx(w)/2 + g->u.posx - center.x, aty = getmaxy(w)/2 + g->u.posy - center.y;
  if (atx >= 0 && atx < g->TERRAIN_WINDOW_WIDTH && aty >= 0 && aty < g->TERRAIN_WINDOW_HEIGHT)
-  mvwputch(w, aty, atx, g->u.color(), '@');
+  draw_player(w, g->u);//mvwputch(w, aty, atx, g->u.color(), '@');
 
 //TILES STUFF
     if (g->u.in_vehicle)
     {
         vehicle *veh = veh_at(g->u.posx, g->u.posy);
         if (veh)
-        {
+        {   //draw cursor indicating the direction of the vehicle
             tileray vdir = veh->move;
             vdir.advance (12);
             putch (w, SEEY + vdir.dy(), SEEX + vdir.dx(), c_green, '+');

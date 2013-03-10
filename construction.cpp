@@ -712,7 +712,7 @@ bool construct::able_door_broken(game *g, point p)
 
 bool construct::able_wall(game *g, point p)
 {
- return (g->m.ter(p.x, p.y) == t_wall || g->m.ter(p.x, p.y) == t_wall ||
+ return (g->m.ter(p.x, p.y) == t_wall_h || g->m.ter(p.x, p.y) == t_wall_v ||
          g->m.ter(p.x, p.y) == t_wall_wood);
 }
 

@@ -210,7 +210,7 @@ void npc::load_info(game *g, std::string data)
 {
  std::stringstream dump;
  std::string tmpname;
- int deathtmp, deadtmp, classtmp;
+ int deathtmp, deadtmp, classtmp, maletmp;
  dump << data;
  dump >> id;
 // Standard player stuff
@@ -224,7 +224,7 @@ void npc::load_info(game *g, std::string data)
          int_cur >> int_max >> per_cur >> per_max >> hunger >> thirst >>
          fatigue >> stim >> pain >> pkill >> radiation >> cash >> recoil >>
          scent >> moves >> underwater >> dodges_left >> oxygen >> deathtmp >>
-         deadtmp >> classtmp >> feature >> patience;
+         deadtmp >> classtmp >> feature >> patience >> maletmp;
 
  if (deathtmp == 1)
   marked_for_death = true;
@@ -235,6 +235,11 @@ void npc::load_info(game *g, std::string data)
   dead = true;
  else
   dead = false;
+
+ if(maletmp)
+  male = true;
+ else
+  male = false;
 
  myclass = npc_class(classtmp);
 

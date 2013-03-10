@@ -135,37 +135,25 @@ void game::init_ui()
     TERRAIN_WINDOW_WIDTH = (VIEWX * 2) + 1;
     TERRAIN_WINDOW_HEIGHT = (VIEWY * 2) + 1;
     // Set up the main UI windows.
-#ifdef TILES
-    // Aw hell, we getting ncursey up in here!
-    w_terrain = newwin(SEEY * 2 + 1, SEEX * 2 + 1, 0, 0);
-    werase(w_terrain);
-    w_minimap = newwin(7, 7, 0, 0, tiles.width*(SEEX * 2 + 1), 0);
-    werase(w_minimap);
-    w_HP = newwin(14, 7, 7, 0, tiles.width*(SEEX * 2 + 1), 0);
-    werase(w_HP);
-    w_moninfo = newwin(12, 48, 0, 7, tiles.width*(SEEX * 2 + 1), 0);
-    werase(w_moninfo);
-    w_messages = newwin(9, 48, 12, 7, tiles.width*(SEEX * 2 + 1), 0);
-    werase(w_messages);
-    w_status = newwin(4, 55, 21, 0, tiles.width*(SEEX * 2 + 1), 0);
-    werase(w_status);
 
+    w_terrain = newwin(TERRAIN_WINDOW_HEIGHT, TERRAIN_WINDOW_WIDTH, 0, 0);  werase(w_terrain);
+
+#ifdef TILES
+    // Aw hell, we getting ncursey up in here!     v was SEEX * 2 + 1
+    w_minimap = newwin( 7,  7,  0,  0, tiles.width*TERRAIN_WINDOW_WIDTH, 0); werase(w_minimap);
+    w_HP      = newwin(14,  7,  7,  0, tiles.width*TERRAIN_WINDOW_WIDTH, 0); werase(w_HP);
+    w_moninfo = newwin(12, 48,  0, 10, tiles.width*(VIEWX * 2), 0);      werase(w_moninfo);
+    w_messages= newwin( 8, 48, 12, 10, tiles.width*(VIEWX * 2), 0);      werase(w_messages);
+    w_location= newwin( 1, 48, 20, 10, tiles.width*(VIEWX * 2), 0);      werase(w_location);
+    w_status  = newwin( 4, 55, 21,  0, tiles.width*TERRAIN_WINDOW_WIDTH, 0); werase(w_status);
     tiles.init(this);
 #else
-    w_terrain = newwin(TERRAIN_WINDOW_HEIGHT, TERRAIN_WINDOW_WIDTH, 0, 0);
-    werase(w_terrain);
-    w_minimap = newwin(7, 7, 0, TERRAIN_WINDOW_WIDTH);
-    werase(w_minimap);
-    w_HP = newwin(14, 7, 7, TERRAIN_WINDOW_WIDTH);
-    werase(w_HP);
-    w_moninfo = newwin(12, 48, 0, VIEWX * 2 + 8);
-    werase(w_moninfo);
-    w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
-    werase(w_messages);
-    w_location = newwin(1, 48, 20, VIEWX * 2 + 8);
-    werase(w_location);
-    w_status = newwin(4, 55, 21, TERRAIN_WINDOW_WIDTH);
-    werase(w_status);
+    w_minimap = newwin( 7,  7,  0, TERRAIN_WINDOW_WIDTH); werase(w_minimap);
+    w_HP      = newwin(14,  7,  7, TERRAIN_WINDOW_WIDTH); werase(w_HP);
+    w_moninfo = newwin(12, 48,  0, VIEWX * 2 + 8);        werase(w_moninfo);
+    w_messages= newwin( 8, 48, 12, VIEWX * 2 + 8);        werase(w_messages);
+    w_location= newwin( 1, 48, 20, VIEWX * 2 + 8);        werase(w_location);
+    w_status  = newwin( 4, 55, 21, TERRAIN_WINDOW_WIDTH); werase(w_status);
 #endif
 }
 
@@ -4760,8 +4748,8 @@ static void open_gate( game *g, const int examx, const int examy, const enum ter
 
  switch(handle_type) {
  case t_gates_mech_control:
-  v_wall_type = t_wall;
-  h_wall_type = t_wall;
+  v_wall_type = t_wall_v;
+  h_wall_type = t_wall_h;
   door_type   = t_door_metal_locked;
   floor_type  = t_floor;
   pull_message = "You turn the handle...";
