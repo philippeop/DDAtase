@@ -6,6 +6,8 @@
 
 void game::init_mapitems()
 {
+ setvector(mapitems[mi_child_items],
+  itm_chocolate, itm_candy, itm_crack, itm_bat, itm_backpack, itm_pockknife, NULL);
 
  setvector(
    mapitems[mi_field],
@@ -768,6 +770,47 @@ void game::init_mapitems()
 	itm_processor, itm_RAM, itm_power_supply, itm_amplifier,
 	itm_transponder, itm_receiver, itm_antenna, itm_steel_chunk, itm_spring,
 	itm_steel_lump, itm_motor, itm_battery, itm_plut_cell, NULL);
+
+ setvector(
+   mapitems[mi_eyebot],
+     itm_flashlight, NULL);
+
+ setvector(
+   mapitems[mi_manhack],
+    itm_knife_combat, NULL);
+
+ setvector(
+   mapitems[mi_skitterbot],
+     itm_tazer, NULL);
+
+ setvector(
+   mapitems[mi_secubot],
+    itm_9mm, itm_steel_plate, NULL);
+
+ setvector(
+   mapitems[mi_copbot],
+     itm_baton, itm_tazer, itm_alloy_plate, NULL);
+
+ setvector(
+   mapitems[mi_molebot],
+     itm_spiked_plate, itm_hard_plate, NULL);
+
+ setvector(
+   mapitems[mi_tripod],
+     itm_flamethrower, itm_alloy_plate, NULL);
+
+ setvector(
+   mapitems[mi_chickenbot],
+     itm_9mm, itm_alloy_plate, NULL);
+
+ setvector(
+   mapitems[mi_tankbot],
+     itm_tazer, itm_flamethrower, itm_9mm, itm_alloy_plate,
+     itm_hard_plate, NULL);
+
+ setvector(
+   mapitems[mi_turret],
+     itm_9mm, NULL);
 
  setvector(
    mapitems[mi_helicopter],

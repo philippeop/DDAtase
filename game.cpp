@@ -270,7 +270,7 @@ bool game::opening_screen()
    savegames.push_back(tmp.substr(0, tmp.find(".sav")));
  }
  closedir(dir);
- dir = opendir("data");
+ dir = opendir("save");
  while ((dp = readdir(dir))) {
   tmp = dp->d_name;
   if (tmp.find(".template") != std::string::npos)
@@ -927,8 +927,9 @@ void game::rustCheck() {
   if (OPTIONS[OPT_SKILL_RUST] == 2)
     return;
 
-  for (std::vector<Skill*>::iterator aSkill = Skill::skills.begin()++; aSkill != Skill::skills.end(); ++aSkill) {
-    int skillLevel = u.skillLevel(*aSkill).level();
+  for (std::vector<Skill*>::iterator aSkill = Skill::skills.begin()++;
+       aSkill != Skill::skills.end(); ++aSkill) {
+    int skillLevel = u.skillLevel(*aSkill);
     int forgetCap = skillLevel > 7 ? 7 : skillLevel;
 
     if (skillLevel > 0 && turn % (8192 / int(pow(2, double(forgetCap - 1)))) == 0) {
@@ -1034,7 +1035,7 @@ void game::process_activity()
 
     if (u.skillLevel(reading->type) < reading->level) {
      int min_ex = reading->time / 10 + u.int_cur / 4,
-       max_ex = reading->time /  5 + u.int_cur / 2 - u.skillLevel(reading->type).level();
+       max_ex = reading->time /  5 + u.int_cur / 2 - u.skillLevel(reading->type);
      if (min_ex < 1)
       min_ex = 1;
      if (max_ex < 2)
@@ -1088,10 +1089,11 @@ void game::process_activity()
     } else {
      u.sklevel[ u.activity.index ]++;
 
-     int skillLevel = u.skillLevel(u.activity.index).level();
+     int skillLevel = u.skillLevel(u.activity.index);
+     u.skillLevel(u.activity.index).level(skillLevel + 1);
      add_msg("You finish training %s to level %d.",
              skill_name(u.activity.index).c_str(),
-             u.skillLevel(u.activity.index).level(skillLevel + 1));
+             u.skillLevel(u.activity.index));
     }
     break;
 
@@ -1831,6 +1833,7 @@ bool game::handle_action()
   case ACTION_TOGGLE_SAFEMODE:
    if (run_mode == 0 ) {
     run_mode = 1;
+    mostseen = 0;
     add_msg("Safe mode ON!");
    } else {
     turnssincelastmon = 0;
@@ -2506,7 +2509,7 @@ z.size(), events.size());
 
   case 11:
     for (std::vector<Skill*>::iterator aSkill = Skill::skills.begin()++; aSkill != Skill::skills.end(); ++aSkill)
-      u.skillLevel(*aSkill).level(u.skillLevel(*aSkill).level() + 3);
+      u.skillLevel(*aSkill).level(u.skillLevel(*aSkill) + 3);
    break;
 
   case 12:
@@ -3481,8 +3484,9 @@ void game::mon_info()
   if (u_see(&(z[i]), buff)) {
    bool mon_dangerous = false;
    int j;
-   if (sees_u(z[i].posx, z[i].posy, j) && (z[i].attitude(&u) == MATT_ATTACK || z[i].attitude(&u) == MATT_FOLLOW)) {
-    mon_dangerous = true;
+   if (z[i].attitude(&u) == MATT_ATTACK || z[i].attitude(&u) == MATT_FOLLOW) {
+    if (sees_u(z[i].posx, z[i].posy, j))
+     mon_dangerous = true;
 
     if (rl_dist(u.posx, u.posy, z[i].posx, z[i].posy) <= iProxyDist)
      newseen++;
@@ -4990,7 +4994,7 @@ void game::examine()
    if (using_electrohack || using_fingerhack) {
     u.moves -= 500;
     u.practice("computer", 20);
-    int success = rng(u.skillLevel("computer").level() / 4 - 2, u.skillLevel("computer").level() * 2);
+    int success = rng(u.skillLevel("computer") / 4 - 2, u.skillLevel("computer") * 2);
     success += rng(-3, 3);
     if (using_fingerhack)
      success++;
@@ -5385,7 +5389,7 @@ shape, but with long, twisted, distended limbs.");
 // apple trees
  else if ((m.ter(examx, examy)==t_tree_apple) && (query_yn("Pick apples?")))
  {
-  int num_apples = rng(1, u.skillLevel("survival").level());
+  int num_apples = rng(1, u.skillLevel("survival"));
   if (num_apples >= 12)
     num_apples = 12;
   for (int i = 0; i < num_apples; i++)
@@ -5396,7 +5400,7 @@ shape, but with long, twisted, distended limbs.");
 // blueberry bushes
  else if ((m.ter(examx, examy)==t_shrub_blueberry) && (query_yn("Pick blueberries?")))
  {
-  int num_blueberries = rng(1, u.skillLevel("survival").level());
+  int num_blueberries = rng(1, u.skillLevel("survival"));
 
  if (num_blueberries >= 12)
     num_blueberries = 12;
@@ -5409,7 +5413,7 @@ shape, but with long, twisted, distended limbs.");
 // harvesting wild veggies
  else if ((m.ter(examx, examy)==t_underbrush) && (query_yn("Forage for wild vegetables?")))
  {
-  u.assign_activity(ACT_FORAGE, 500 / (u.skillLevel("survival").level() + 1), 0);
+  u.assign_activity(ACT_FORAGE, 500 / (u.skillLevel("survival") + 1), 0);
   u.activity.placement = point(examx, examy);
   u.moves = 0;
  }
@@ -5589,7 +5593,7 @@ point game::look_around()
    mvwprintw(w_look, 6, 1, "Graffiti: %s", m.graffiti_at(lx, ly).contents->c_str());
   wrefresh(w_look);
   refresh_terrain();;
- } while (input != Close && input != Cancel);
+ } while (input != Close && input != Cancel && input != Confirm);
  if (input == Confirm)
   return point(lx, ly);
  return point(-1, -1);
@@ -6865,7 +6869,7 @@ void game::complete_butcher(int index)
  int pieces, pelts, bones, sinews;
  double skill_shift = 0.;
 
- int sSkillLevel = u.skillLevel("survival").level();
+ int sSkillLevel = u.skillLevel("survival");
 
  switch (corpse->size) {
   case MS_TINY:   pieces =  1; pelts =  1; bones = 1; sinews = 1; break;
@@ -6944,6 +6948,30 @@ void game::complete_butcher(int index)
    m.add_item(u.posx, u.posy, pelt, age);
   }
  }
+
+ //Add a chance of CBM recovery. For shocker and cyborg corpses.
+ if (corpse->has_flag(MF_CBM)) {
+  //As long as the factor is above -4 (the sinew cutoff), you will be able to extract cbms
+  if(skill_shift >= 0){
+   add_msg("You discover a CBM in the %s!", corpse->name.c_str());
+   //To see if it spawns a battery
+   if(rng(0,1) == 1){ //The battery works
+    m.add_item(u.posx, u.posy, itypes[itm_bionics_batteries], age);
+   }else{//There is a burnt out CBM
+    m.add_item(u.posx, u.posy, itypes[itm_burnt_out_bionic], age);
+   }
+  }
+  if(skill_shift >= 0){
+   //To see if it spawns a random additional CBM
+   if(rng(0,1) == 1){ //The CBM works
+    int index = rng(0, mapitems[mi_bionics].size()-1);
+    m.add_item(u.posx, u.posy, itypes[ mapitems[mi_bionics][index] ], age);
+   }else{//There is a burnt out CBM
+    m.add_item(u.posx, u.posy, itypes[itm_burnt_out_bionic], age);
+   }
+  }
+ }
+
  if (pieces <= 0)
   add_msg("Your clumsy butchering destroys the meat!");
  else {
@@ -6972,7 +7000,7 @@ void game::forage()
 {
   int veggy_chance = rng(1, 20);
 
-  if (veggy_chance < u.skillLevel("survival").level())
+  if (veggy_chance < u.skillLevel("survival"))
   {
     add_msg("You found some wild veggies!");
     u.practice("survival", 10);
@@ -6982,7 +7010,7 @@ void game::forage()
   else
   {
     add_msg("You didn't find anything.");
-    if (!one_in(u.skillLevel("survival").level()))
+    if (!one_in(u.skillLevel("survival")))
     m.ter(u.activity.placement.x, u.activity.placement.y) = t_dirt;
   }
 }
@@ -7387,7 +7415,7 @@ void game::pldrive(int x, int y) {
  }
  veh->turn (15 * x);
  if (veh->skidding && veh->valid_wheel_config()) {
-  if (rng (0, 100) < u.dex_cur + u.skillLevel("driving").level() * 2) {
+  if (rng (0, 100) < u.dex_cur + u.skillLevel("driving") * 2) {
    add_msg ("You regain control of the %s.", veh->name.c_str());
    veh->velocity = veh->forward_velocity();
    veh->skidding = false;
@@ -7542,10 +7570,10 @@ void game::plmove(int x, int y)
 
 // Adjust recoil down
   if (u.recoil > 0) {
-    if (int(u.str_cur / 2) + u.skillLevel("gun").level() >= u.recoil)
+    if (int(u.str_cur / 2) + u.skillLevel("gun") >= u.recoil)
     u.recoil = 0;
    else {
-     u.recoil -= int(u.str_cur / 2) + u.skillLevel("gun").level();
+     u.recoil -= int(u.str_cur / 2) + u.skillLevel("gun");
     u.recoil = int(u.recoil / 2);
    }
   }

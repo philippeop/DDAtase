@@ -122,7 +122,7 @@ bool player::create(game *g, character_type type, std::string tempname)
       rn = random_skill();
 
       Skill *aSkill = Skill::skill(rn);
-      int level = skillLevel(aSkill).level();
+      int level = skillLevel(aSkill);
 
       if (level < points) {
         points -= level + 1;
@@ -135,7 +135,7 @@ bool player::create(game *g, character_type type, std::string tempname)
    case PLTYPE_TEMPLATE: {
     std::ifstream fin;
     std::stringstream filename;
-    filename << "data/" << tempname << ".template";
+    filename << "save/" << tempname << ".template";
     fin.open(filename.str().c_str());
     if (!fin.is_open()) {
      debugmsg("Couldn't open %s!", filename.str().c_str());
@@ -727,12 +727,12 @@ int set_skills(WINDOW* w, player *u, int &points)
                                                                              ");
   mvwprintz(w, 24, 0, c_ltgray, "\
                                                                              ");
-  if (points >= u->skillLevel(currentSkill).level() + 1)
+  if (points >= u->skillLevel(currentSkill) + 1)
    mvwprintz(w,  3, 30, COL_SKILL_USED, "Upgrading %s costs %d points         ",
-             skill_name(cur_sk).c_str(), u->skillLevel(currentSkill).level() + 1);
+             skill_name(cur_sk).c_str(), u->skillLevel(currentSkill) + 1);
   else
    mvwprintz(w,  3, 30, c_ltred, "Upgrading %s costs %d points         ",
-             skill_name(cur_sk).c_str(), u->skillLevel(currentSkill).level() + 1);
+             skill_name(cur_sk).c_str(), u->skillLevel(currentSkill) + 1);
   mvwprintz(w, 22, 0, COL_SKILL_USED, currentSkill->description().c_str());
 
   if (cur_sk <= 7) {
@@ -748,7 +748,7 @@ int set_skills(WINDOW* w, player *u, int &points)
      mvwprintz(w, 4 + i, 0,
                (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED),
                "%s ", skill_name(i).c_str());
-     for (int j = 0; j < u->skillLevel(thisSkill).level(); j++)
+     for (int j = 0; j < u->skillLevel(thisSkill); j++)
       wprintz(w, (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED), "*");
     }
    }
@@ -764,7 +764,7 @@ int set_skills(WINDOW* w, player *u, int &points)
      mvwprintz(w, 21 + i - num_skill_types, 0,
                (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED), "%s ",
                thisSkill->name().c_str());
-     for (int j = 0; j < u->skillLevel(thisSkill).level(); j++)
+     for (int j = 0; j < u->skillLevel(thisSkill); j++)
       wprintz(w, (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED), "*");
     }
    }
@@ -780,7 +780,7 @@ int set_skills(WINDOW* w, player *u, int &points)
      mvwprintz(w, 12 + i - cur_sk, 0,
                (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED),
                "%s ", thisSkill->name().c_str());
-     for (int j = 0; j < u->skillLevel(thisSkill).level(); j++)
+     for (int j = 0; j < u->skillLevel(thisSkill); j++)
       wprintz(w, (i == cur_sk ? hilite(COL_SKILL_USED) : COL_SKILL_USED), "*");
     }
    }
@@ -799,15 +799,15 @@ int set_skills(WINDOW* w, player *u, int &points)
     currentSkill = Skill::skill(cur_sk);
     break;
    case 'h':
-     if (u->skillLevel(currentSkill).level()) {
-      u->skillLevel(currentSkill).level(u->skillLevel(currentSkill).level() - 2);
-      points += u->skillLevel(currentSkill).level() + 1;
+     if (u->skillLevel(currentSkill)) {
+      u->skillLevel(currentSkill).level(u->skillLevel(currentSkill) - 2);
+      points += u->skillLevel(currentSkill) + 1;
     }
     break;
    case 'l':
-     if (points >= u->skillLevel(currentSkill).level() + 1) {
-       points -= u->skillLevel(currentSkill).level() + 1;
-       u->skillLevel(currentSkill).level(u->skillLevel(currentSkill).level() + 2);
+     if (points >= u->skillLevel(currentSkill) + 1) {
+       points -= u->skillLevel(currentSkill) + 1;
+       u->skillLevel(currentSkill).level(u->skillLevel(currentSkill) + 2);
     }
     break;
    case '<':
@@ -968,7 +968,7 @@ void save_template(player *u)
  if (name.length() == 0)
   return;
  std::stringstream playerfile;
- playerfile << "data/" << name << ".template";
+ playerfile << "save/" << name << ".template";
  std::ofstream fout;
  fout.open(playerfile.str().c_str());
  fout << u->save_info();
