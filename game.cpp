@@ -111,6 +111,9 @@ void game::init_ui(){
  werase(w_HP);
  w_moninfo = newwin(12, 48, 0, VIEWX * 2 + 8);
  werase(w_moninfo);
+
+//CAT
+// w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
  w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
  werase(w_messages);
  w_location = newwin(1, 48, 20, VIEWX * 2 + 8);
@@ -613,6 +616,8 @@ void game::create_starting_npcs()
 }
 
 void game::cleanup_at_end(){
+
+//CAT: check this
  write_msg();
 
  // Save the monsters before we die!
@@ -745,6 +750,7 @@ bool game::do_turn()
 
  if (u.has_disease(DI_SLEEP) && int(turn) % 300 == 0) {
   draw();
+//CAT: check this
   refresh();
  }
 
@@ -1774,7 +1780,9 @@ bool game::handle_action()
 
   case ACTION_BIONICS:
    u.power_bionics(this);
-   refresh_all();
+
+//CAT
+//   refresh_all();
    break;
 
   case ACTION_WAIT:
@@ -1875,11 +1883,16 @@ bool game::handle_action()
 
   case ACTION_PL_INFO:
    u.disp_info(this);
-   refresh_all();
+ 
+//CAT:
+//  refresh_all();
    break;
 
   case ACTION_MAP:
    draw_overmap();
+
+//CAT:
+//   refresh_all();
    break;
 
   case ACTION_MISSIONS:
@@ -1892,7 +1905,8 @@ bool game::handle_action()
 
   case ACTION_MORALE:
    u.disp_morale();
-   refresh_all();
+//CAT:
+//   refresh_all();
    break;
 
   case ACTION_MESSAGES:
@@ -1901,7 +1915,9 @@ bool game::handle_action()
 
   case ACTION_HELP:
    help();
-   refresh_all();
+
+//CAT:
+//   refresh_all();
    break;
 
   case ACTION_DEBUG:
@@ -2852,8 +2868,10 @@ void game::list_missions()
 
 void game::draw()
 {
- // Draw map
- werase(w_terrain);
+
+//CAT:
+ //werase(w_terrain);
+
  draw_ter();
  draw_footsteps();
  mon_info();
@@ -2974,6 +2992,8 @@ void game::refresh_all()
  draw_HP();
  wrefresh(w_moninfo);
  wrefresh(w_messages);
+
+//CAT: needed on Lin but not Win, hmmm...
  refresh();
 }
 
@@ -3044,8 +3064,9 @@ void game::draw_HP()
 
 void game::draw_minimap()
 {
- // Draw the box
+//CAT: needed on Lin but not Win, hmmm...
  werase(w_minimap);
+
  mvwputch(w_minimap, 0, 0, c_white, LINE_OXXO);
  mvwputch(w_minimap, 0, 6, c_white, LINE_OOXX);
  mvwputch(w_minimap, 6, 0, c_white, LINE_XXOO);
@@ -3643,7 +3664,10 @@ void game::mon_info()
  }
 
  wrefresh(w_moninfo);
- refresh();
+
+//CAT:
+// refresh();
+
 }
 
 void game::cleanup_dead()
@@ -3992,7 +4016,8 @@ void game::explosion(int x, int y, int power, int shrapnel, bool fire)
                        x + i + VIEWX - u.posx - u.view_offset_x, c_red,'|');
   }
   wrefresh(w_terrain);
-  nanosleep(&ts, NULL);
+//CAT:
+//  nanosleep(&ts, NULL);
  }
 
 // The rest of the function is shrapnel
@@ -4017,7 +4042,8 @@ void game::explosion(int x, int y, int power, int shrapnel, bool fire)
     mvwputch(w_terrain, traj[j].y + VIEWY - u.posy - u.view_offset_y,
                         traj[j].x + VIEWX - u.posx - u.view_offset_x, c_red, '`');
     wrefresh(w_terrain);
-    nanosleep(&ts, NULL);
+//CAT:
+//    nanosleep(&ts, NULL);
    }
    tx = traj[j].x;
    ty = traj[j].y;
@@ -4384,8 +4410,12 @@ void game::open()
 {
  u.moves -= 100;
  bool didit = false;
- mvwprintw(w_terrain, 0, 0, "Open where? (hjklyubn) ");
+
+//CAT:
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Open where?");
  wrefresh(w_terrain);
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int openx, openy;
  InputEvent input = get_input();
@@ -4433,8 +4463,12 @@ void game::open()
 void game::close()
 {
  bool didit = false;
- mvwprintw(w_terrain, 0, 0, "Close where? (hjklyubn) ");
+
+//CAT:
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Close where?");
  wrefresh(w_terrain);
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int closex, closey;
  InputEvent input = get_input();
@@ -4473,8 +4507,12 @@ void game::smash()
  bool didit = false;
  std::string bashsound, extra;
  int smashskill = int(u.str_cur / 2.5 + u.weapon.type->melee_dam);
- mvwprintw(w_terrain, 0, 0, "Smash what? (hjklyubn) ");
+
+//CAT:
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Smash what?");
  wrefresh(w_terrain);
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  InputEvent input = get_input();
  last_action += input;
@@ -4539,8 +4577,14 @@ void game::use_wielded_item()
 
 bool game::pl_choose_vehicle (int &x, int &y)
 {
- refresh_all();
- mvprintz(0, 0, c_red, "Choose a vehicle at direction:");
+//CAT:
+// refresh_all();
+// mvprintz(0, 0, c_red, "What direction?");
+
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Refill where?");
+ wrefresh(w_terrain);
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  InputEvent input = get_input();
  int dirx, diry;
@@ -4883,8 +4927,11 @@ void game::examine()
    return;
   }
  }
- mvwprintw(w_terrain, 0, 0, "Examine where? (Direction button) ");
+
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Examine where?");
  wrefresh(w_terrain);
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int examx, examy;
  InputEvent input = get_input();
@@ -5028,7 +5075,10 @@ void game::examine()
     }
    }
   }
-  refresh_all();
+
+//CAT:
+//  refresh_all();
+
 }
  else if (m.ter(examx, examy) == t_gates_mech_control && query_yn("Use this winch?"))
  {
@@ -5446,7 +5496,13 @@ void game::peek()
  int mx, my;
  InputEvent input;
 
- mvprintz(0, 0, c_white, "Use directional keys to chose an adjacent square to peek from.");
+//CAT::
+// mvprintz(0, 0, c_white, "Use directional keys to chose an adjacent square to peek from.");
+
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Peek from where where?");
+ wrefresh(w_terrain);
+
 
  input = get_input();
  get_direction (mx, my, input);
@@ -5463,7 +5519,10 @@ void game::peek()
 
 point game::look_around()
 {
- draw_ter();
+//CAT: check this
+// draw_ter();
+
+
  int lx = u.posx + u.view_offset_x, ly = u.posy + u.view_offset_y;
  int mx, my, junk;
  InputEvent input;
@@ -5834,7 +5893,10 @@ void game::list_items()
 void game::pickup(int posx, int posy, int min)
 {
  item_exchanges_since_save += 1; // Keeping this simple.
+
+//CAT: check this
  write_msg();
+
  if (u.weapon.type->id == itm_bio_claws) {
   add_msg("You cannot pick up items with your claws out!");
   return;
@@ -6474,8 +6536,13 @@ void game::drop(char chInput)
 
 void game::drop_in_direction()
 {
- refresh_all();
- mvprintz(0, 0, c_red, "Choose a direction:");
+//CAT:
+// mvprintz(0, 0, c_red, "Drop where?");
+ //w_terrain->FG= 1;
+ mvwprintw(w_terrain, 0, 0, "Drop where?");
+ wrefresh(w_terrain);
+
+
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int dirx, diry;
  InputEvent input = get_input();
@@ -6686,6 +6753,8 @@ void game::plfire(bool burst)
 
   u.weapon.reload(u, reload_index);
   u.moves -= u.weapon.reload_time(u);
+
+//CAT: check this...
   refresh_all();
  }
 
@@ -7393,6 +7462,15 @@ void game::pldrive(int x, int y) {
  u.moves = 0;
  if (x != 0 && veh->velocity != 0 && one_in(4))
    u.practice("driving", 1);
+
+//CAT:
+	float cat_vel= veh->velocity*1.5;
+	if(cat_vel > 10000) cat_vel= 10000;
+	float cat_sin = sin(veh->turn_dir*M_PI/180)* cat_vel;
+	float cat_cos = cos(veh->turn_dir*M_PI/180)* cat_vel;
+
+		u.view_offset_y= (int)cat_sin/1000;
+		u.view_offset_x= (int)cat_cos/1000;
 }
 
 void game::plmove(int x, int y)
@@ -7839,7 +7917,8 @@ void game::fling_player_or_monster(player *p, monster *zz, int dir, int flvel)
         timespec ts;   // Timespec for the animation
         ts.tv_sec = 0;
         ts.tv_nsec = BILLION / 20;
-        nanosleep (&ts, 0);
+//CAT:
+//        nanosleep (&ts, 0);
     }
 
     if (!m.has_flag(swimmable, x, y))
@@ -8577,17 +8656,19 @@ void game::write_msg()
    mesSS << mes << " x " << messages[i].count;
    mes = mesSS.str();
   }
+
+//CAT:	
 // Split the message into many if we must!
   size_t split;
   while (mes.length() > maxlength && line >= 0) {
    split = mes.find_last_of(' ', maxlength);
    if (split > maxlength)
     split = maxlength;
-   nc_color col = c_dkgray;
+   nc_color col = c_ltgray;
    if (int(messages[i].turn) >= curmes)
-    col = c_ltred;
-   else if (int(messages[i].turn) + 5 >= curmes)
-    col = c_ltgray;
+    col = c_yellow;
+   else if (int(messages[i].turn) + 4 > curmes)
+    col = c_white;
    //mvwprintz(w_messages, line, 0, col, mes.substr(0, split).c_str());
    mvwprintz(w_messages, line, 0, col, mes.substr(split + 1).c_str());
    mes = mes.substr(0, split);
@@ -8595,15 +8676,17 @@ void game::write_msg()
    //mes = mes.substr(split + 1);
   }
   if (line >= 0) {
-   nc_color col = c_dkgray;
+   nc_color col = c_ltgray;
    if (int(messages[i].turn) >= curmes)
-    col = c_ltred;
-   else if (int(messages[i].turn) + 5 >= curmes)
-    col = c_ltgray;
+    col = c_yellow;
+   else if (int(messages[i].turn) + 4 > curmes)
+    col = c_white;
    mvwprintz(w_messages, line, 0, col, mes.c_str());
    line--;
   }
  }
+//CAT:-END 
+
  curmes = int(turn);
  wrefresh(w_messages);
 }

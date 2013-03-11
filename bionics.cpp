@@ -199,8 +199,14 @@ void player::activate_bionic(int b, game *g)
   break;
 
  case bio_lighter:
-  g->draw();
-  mvprintw(0, 0, "Torch in which direction?");
+//CAT:
+//  g->draw();
+//  mvprintw(0, 0, "Torch in which direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Torch where?");
+ wrefresh(g->w_terrain);
+
   input = get_input();
   get_direction(dirx, diry, input);
   if (dirx == -2) {
@@ -252,8 +258,14 @@ void player::activate_bionic(int b, game *g)
   break;
 
  case bio_emp:
-  g->draw();
-  mvprintw(0, 0, "Fire EMP in which direction?");
+//CAT:
+//  g->draw();
+//  mvprintw(0, 0, "Fire EMP in which direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Fire where?");
+ wrefresh(g->w_terrain);
+
   input = get_input();
   get_direction(dirx, diry, input);
   if (dirx == -2) {
@@ -338,8 +350,14 @@ void player::activate_bionic(int b, game *g)
   break;
 
  case bio_lockpick:
-  g->draw();
-  mvprintw(0, 0, "Unlock in which direction?");
+//CAT:
+//  g->draw();
+//  mvprintw(0, 0, "Unlock in which direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Unlock where?");
+ wrefresh(g->w_terrain);
+
   input = get_input();
   get_direction(dirx, diry, input);
   if (dirx == -2) {
@@ -370,9 +388,9 @@ bool player::install_bionics(game *g, it_bionic* type)
  WINDOW* w = newwin(25, 80, 0, 0);
 
  int pl_skill = int_cur +
-   skillLevel("electronics") * 4 +
-   skillLevel("firstaid")    * 3 +
-   skillLevel("mechanics")   * 2;
+   skillLevel("electronics").level() * 4 +
+   skillLevel("firstaid").level()    * 3 +
+   skillLevel("mechanics").level()   * 2;
 
  int skint = int(pl_skill / 4);
  int skdec = int((pl_skill * 10) / 4) % 10;

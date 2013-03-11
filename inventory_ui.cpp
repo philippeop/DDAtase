@@ -482,7 +482,10 @@ void game::compare(int iCompareX, int iCompareY)
   examx = iCompareX;
   examy = iCompareY;
  } else {
-  mvwprintw(w_terrain, 0, 0, "Compare where? (Direction button)");
+
+//CAT:
+  //w_terrain->FG= 1;
+  mvwprintw(w_terrain, 0, 0, "Compare where?");
   wrefresh(w_terrain);
 
   ch = input();
@@ -698,8 +701,11 @@ void game::compare(int iCompareX, int iCompareY)
    bShowCompare = false;
   }
  } while (ch != '\n' && ch != KEY_ESCAPE && ch != ' ');
- werase(w_inv);
- delwin(w_inv);
- erase();
+
+//CAT:
+// werase(w_inv);
+// delwin(w_inv);
+// erase();
+
  refresh_all();
 }

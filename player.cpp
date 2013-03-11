@@ -1619,7 +1619,10 @@ void player::disp_morale()
 
 void player::disp_status(WINDOW *w, game *g)
 {
- mvwprintz(w, 0, 0, c_ltgray, "Weapon: %s", weapname().c_str());
+
+//CAT:
+ mvwprintz(w, 0, 0, c_ltblue, "Weapon: %s", weapname().c_str());
+
  if (weapon.is_gun()) {
    int adj_recoil = recoil + driving_recoil;
        if (adj_recoil >= 36)
@@ -1634,9 +1637,11 @@ void player::disp_status(WINDOW *w, game *g)
 
  // Print the current weapon mode
  if (weapon.mode == IF_NULL)
-  mvwprintz(w, 1, 0, c_red,    "Normal");
+
+//CAT:
+  mvwprintz(w, 1, 0, c_ltblue,    "Normal");
  else if (weapon.mode == IF_MODE_BURST)
-  mvwprintz(w, 1, 0, c_red,    "Burst");
+  mvwprintz(w, 1, 0, c_ltblue,    "Burst");
  else {
   item* gunmod = weapon.active_gunmod();
   if (gunmod != NULL)

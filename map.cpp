@@ -233,6 +233,11 @@ void map::board_vehicle(game *g, int x, int y, player *p)
 
 void map::unboard_vehicle(game *g, const int x, const int y)
 {
+
+//CAT:
+ g->u.view_offset_y= 0;
+ g->u.view_offset_x= 0;
+
  int part = 0;
  vehicle *veh = veh_at(x, y, part);
  if (!veh) {
@@ -707,7 +712,8 @@ bool map::vehproceed(game* g){
       timespec ts;   // Timespec for the animation
       ts.tv_sec = 0;
       ts.tv_nsec = ns_per_frame;
-      nanosleep (&ts, 0);
+//CAT:
+//      nanosleep (&ts, 0);
    }
 
    if (can_move) {
@@ -2425,102 +2431,104 @@ void map::debug()
  getch();
 }
 
+//CAT:
 void map::draw(game *g, WINDOW* w, const point center)
 {
- g->reset_light_level();
- const int natural_sight_range = g->u.sight_range(1);
- const int light_sight_range = g->u.sight_range(g->light_level());
- const int lowlight_sight_range = std::max((int)g->light_level() / 2, natural_sight_range);
- const int max_sight_range = g->u.unimpaired_range();
+  g->reset_light_level();
+  const int max_sight_range = g->u.unimpaired_range();
+  const int natural_sight_range = g->u.sight_range(1);
+  const int light_sight_range = g->u.sight_range(g->light_level());
 
- for (int i = 0; i < my_MAPSIZE * my_MAPSIZE; i++) {
-  if (!grid[i])
-   debugmsg("grid %d (%d, %d) is null! mapbuffer size = %d",
+  int lowlight_sight_range = std::max((int)g->light_level()-1, natural_sight_range);
+
+  for (int i = 0; i < my_MAPSIZE * my_MAPSIZE; i++)
+  {
+    if (!grid[i])
+	debugmsg("grid %d (%d, %d) is null! mapbuffer size = %d",
             i, i % my_MAPSIZE, i / my_MAPSIZE, MAPBUFFER.size());
- }
-
- bool u_is_boomered = g->u.has_disease(DI_BOOMERED);
- int  u_clairvoyance = g->u.clairvoyance();
- bool u_sight_impaired = g->u.sight_impaired();
- int  g_light_level = (int)g->light_level();
-
- char trans_buf[my_MAPSIZE*SEEX][my_MAPSIZE*SEEY];
- memset(trans_buf, -1, sizeof(trans_buf));
- for  (int realx = center.x - getmaxx(w)/2; realx <= center.x + getmaxx(w)/2; realx++) {
-  for (int realy = center.y - getmaxy(w)/2; realy <= center.y + getmaxy(w)/2; realy++) {
-   const int dist = rl_dist(g->u.posx, g->u.posy, realx, realy);
-   int sight_range = light_sight_range;
-   int low_sight_range = lowlight_sight_range;
-
-   // While viewing indoor areas use lightmap model
-   if (!g->lm.is_outside(realx - g->u.posx, realy - g->u.posy)) {
-    sight_range = natural_sight_range;
-   // Don't display area as shadowy if it's outside and illuminated by natural light
-   } else if (dist <= g->u.sight_range(g_light_level)) {
-    low_sight_range = std::max(g_light_level, natural_sight_range);
-   }
-
-   // I've moved this part above loops without even thinking that
-   // this must stay here...
-   int real_max_sight_range = light_sight_range > max_sight_range ? light_sight_range : max_sight_range;
-   int distance_to_look = real_max_sight_range;
-   if (OPTIONS[OPT_GRADUAL_NIGHT_LIGHT] > 0.) {
-    // in this case we'll be always looking at maximum distance
-    // and light level should do rest of the work....
-    distance_to_look = DAYLIGHT_LEVEL;
-   }
-
-   int diffx = (g->u.posx - center.x), diffy = (g->u.posy - center.y);
-   bool can_see = g->lm.sees(diffx, diffy, realx - center.x, realy - center.y, distance_to_look);
-   lit_level lit = g->lm.at(realx - center.x, realy - center.y);
-
-   if (OPTIONS[OPT_GRADUAL_NIGHT_LIGHT] > 0.) {
-    // now we're gonna adjust real_max_sight, to cover some nearby "highlights",
-	// but at the same time changing light-level depending on distance,
-	// to create actual "gradual" stuff
-	// Also we'll try to ALWAYS show LL_BRIGHT stuff independent of where it is...
-    if (lit != LL_BRIGHT) {
-     if (dist > real_max_sight_range) {
-      int intLit = (int)lit - (dist - real_max_sight_range)/2;
-      if (intLit < 0) intLit = LL_DARK;
-      lit = (lit_level)intLit;
-     }
-    }
-	// additional case for real_max_sight_range
-	// if both light_sight_range and max_sight_range were small
-	// it means we really have limited visibility (e.g. inside a pit)
-	// and we shouldn't touch that
-	if (lit > LL_DARK && real_max_sight_range > 1) {
-     real_max_sight_range = distance_to_look;
-    }
-   }
-
-   if (dist > real_max_sight_range ||
-       (dist > light_sight_range &&
-         (lit == LL_DARK ||
-         (u_sight_impaired && lit != LL_BRIGHT)))) {
-    if (u_is_boomered)
-   	 mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_magenta, '#');
-    else
-         mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_dkgray, '#');
-   } else if (dist > light_sight_range && u_sight_impaired && lit == LL_BRIGHT) {
-    if (u_is_boomered)
-     mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_pink, '#');
-    else
-     mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_ltgray, '#');
-   } else if (dist <= u_clairvoyance || can_see) {
-    drawsq(w, g->u, realx, realy, false, true, center.x, center.y,
-           (dist > low_sight_range && LL_LIT > lit) ||
-	   (dist > sight_range && LL_LOW == lit),
-           LL_BRIGHT == lit);
-   } else {
-    mvwputch(w, realy+getmaxy(w)/2 - center.y, realx+getmaxx(w)/2 - center.x, c_black,'#');
-   }
   }
- }
- int atx = getmaxx(w)/2 + g->u.posx - center.x, aty = getmaxy(w)/2 + g->u.posy - center.y;
- if (atx >= 0 && atx < g->TERRAIN_WINDOW_WIDTH && aty >= 0 && aty < g->TERRAIN_WINDOW_HEIGHT)
-  mvwputch(w, aty, atx, g->u.color(), '@');
+
+  int  g_light_level = (int)g->light_level();
+  int  u_clairvoyance = g->u.clairvoyance();
+  bool u_is_boomered = g->u.has_disease(DI_BOOMERED);
+  bool u_sight_impaired = g->u.sight_impaired();
+  
+  char trans_buf[my_MAPSIZE*SEEX][my_MAPSIZE*SEEY];
+  memset(trans_buf, -1, sizeof(trans_buf));
+
+  for(int realx = center.x - getmaxx(w)/2; realx <= center.x + getmaxx(w)/2; realx++) 
+  {
+    for(int realy = center.y - getmaxy(w)/2; realy <= center.y + getmaxy(w)/2; realy++)
+    {
+	int sight_range = light_sight_range;
+	int catY= realy+getmaxy(w)/2 - center.y;
+	int catX= realx+getmaxx(w)/2 - center.x;
+
+	const int dist = rl_dist(g->u.posx, g->u.posy, realx, realy);
+
+	//While viewing indoor areas use lightmap model
+	if (!g->lm.is_outside(realx - g->u.posx, realy - g->u.posy))
+	  sight_range = natural_sight_range;
+
+	lit_level lit = g->lm.at(realx - center.x, realy - center.y);
+	int diffx = (g->u.posx - center.x), diffy = (g->u.posy - center.y);
+	bool can_see = g->lm.sees(diffx, diffy, realx - center.x, realy - center.y, DAYLIGHT_LEVEL);
+
+	if(dist > DAYLIGHT_LEVEL || ( dist > light_sight_range && 
+	  (lit == LL_DARK || (u_sight_impaired && lit != LL_BRIGHT)) )) 
+	{
+	  if (u_is_boomered)
+   	    mvwputch(w, catY, catX, c_magenta, '#');
+	  else
+	    mvwputch(w, catY, catX, c_black, ' ');
+
+	}else 
+	if (dist > light_sight_range && u_sight_impaired && lit == LL_BRIGHT)
+	{
+	  if (u_is_boomered)
+	    mvwputch(w, catY, catX, c_pink, '#');
+	  else
+	  //CAT: what's this?
+	    mvwputch(w, catY, catX, c_ltgray, '@'); 
+
+	}else 
+	if (dist <= u_clairvoyance || can_see) 
+	{
+	  drawsq(w, g->u, realx, realy, false, true, center.x, center.y,
+	    (dist > lowlight_sight_range && LL_LIT > lit) || (dist > sight_range && LL_LOW == lit),
+	    LL_BRIGHT == lit);
+
+	}else
+	{
+
+/*
+	  if(!is_outside(realx, realy) )
+	    mvwputch(w, catY, catX, c_dkgray,'#');	
+	  else
+	  {
+//	    if(LL_BRIGHT != lit && LL_LOW == lit)
+//		drawsq(w, g->u, realx, realy, false, true, center.x, center.y, false, true);
+
+	    drawsq(w, g->u, realx, realy, false, true, center.x, center.y,
+		(dist > lowlight_sight_range && LL_LIT > lit) || (dist > sight_range && LL_LOW == lit),
+		LL_BRIGHT == lit);
+
+//	    else
+	  }
+*/
+
+		mvwputch(w, catY, catX, c_black,' ');
+				
+
+
+	}
+
+    }//end for realx
+  }//end for realy
+
+  int atx = getmaxx(w)/2 + g->u.posx - center.x, aty = getmaxy(w)/2 + g->u.posy - center.y;
+  if (atx >= 0 && atx < g->TERRAIN_WINDOW_WIDTH && aty >= 0 && aty < g->TERRAIN_WINDOW_HEIGHT)
+	mvwputch(w, aty, atx, g->u.color(), '@');
 }
 
 void map::drawsq(WINDOW* w, player &u, const int x, const int y, const bool invert_arg,

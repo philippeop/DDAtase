@@ -713,9 +713,15 @@ void iuse::marloss(game *g, player *p, item *it, bool t)
 
 void iuse::dogfood(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Which direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Feed where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Which direction?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -742,9 +748,15 @@ void iuse::dogfood(game *g, player *p, item *it, bool t)
 
 void iuse::lighter(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Light where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Light where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Light where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -945,8 +957,14 @@ void iuse::scissors(game *g, player *p, item *it, bool t)
 
 void iuse::extinguisher(game *g, player *p, item *it, bool t)
 {
- g->draw();
- mvprintz(0, 0, c_red, "Pick a direction to spray:");
+//CAT:
+// g->draw();
+// mvprintz(0, 0, c_red, "Pick a direction to spray:");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Spray where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
@@ -994,8 +1012,14 @@ void iuse::extinguisher(game *g, player *p, item *it, bool t)
 
 void iuse::hammer(game *g, player *p, item *it, bool t)
 {
- g->draw();
- mvprintz(0, 0, c_red, "Pick a direction in which to pry:");
+//CAT:
+// g->draw();
+// mvprintz(0, 0, c_red, "Pick a direction in which to pry:");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Hammer where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
@@ -1219,9 +1243,15 @@ void iuse::radio_on(game *g, player *p, item *it, bool t)
 
 void iuse::picklock(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Pick where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Unlock where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Pick which lock?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -1285,9 +1315,15 @@ void iuse::picklock(game *g, player *p, item *it, bool t)
 }
 void iuse::crowbar(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Pry where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Pry where?"); 
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Pry where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -1393,6 +1429,8 @@ void iuse::makemound(game *g, player *p, item *it, bool t)
 
 void iuse::dig(game *g, player *p, item *it, bool t)
 {
+//CAT: hmmm...
+
  g->add_msg_if_player(p,"You can dig a pit via the construction menu--hit *");
 /*
  int dirx, diry;
@@ -1441,9 +1479,15 @@ void iuse::chainsaw_on(game *g, player *p, item *it, bool t)
 
 void iuse::jackhammer(game *g, player *p, item *it, bool t)
 {
+//CAT:
+//g->draw();
+// mvprintw(0, 0, "Drill where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Drill where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Drill in which direction?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -1474,9 +1518,15 @@ void iuse::jackhammer(game *g, player *p, item *it, bool t)
 
 void iuse::jacqueshammer(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Percer dans quelle direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Drill where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Percer dans quelle direction?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Direction invalide");
@@ -1507,6 +1557,11 @@ void iuse::jacqueshammer(game *g, player *p, item *it, bool t)
 
 void iuse::pickaxe(game *g, player *p, item *it, bool t)
 {
+//CAT: hmmm...
+  g->add_msg_if_player(p,"Whoa buddy! You can't go cheating in items and");
+  g->add_msg_if_player(p,"just expect them to work! Now put the pickaxe");
+  g->add_msg_if_player(p,"down and go play the game.");
+
 /* int dirx, diry;
  g->draw();
  mvprintw(0, 0, "Drill in which direction?");
@@ -1534,11 +1589,18 @@ void iuse::pickaxe(game *g, player *p, item *it, bool t)
   g->add_msg_if_player(p,"just expect them to work! Now put the pickaxe");
   g->add_msg_if_player(p,"down and go play the game.");
 }
+
 void iuse::set_trap(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Place where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Place where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Place where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -2167,9 +2229,15 @@ void iuse::manhack(game *g, player *p, item *it, bool t)
 
 void iuse::turret(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Place where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Place where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Place where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -2218,9 +2286,15 @@ void iuse::UPS_on(game *g, player *p, item *it, bool t)
 
 void iuse::tazer(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Shock in which direction?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Shock where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Shock in which direction?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -2599,9 +2673,15 @@ void iuse::lumber(game *g, player *p, item *it, bool t)
 
 void iuse::hacksaw(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Cut up metal where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Cut where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Cut up metal where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg("Invalid direction.");
@@ -2644,9 +2724,15 @@ if (dirx == 0 && diry == 0) {
 
 void iuse::tent(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Put up tent where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Pitch where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Put up tent where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2 || (dirx == 0 && diry == 0)) {
   g->add_msg_if_player(p,"Invalid direction.");
@@ -2975,9 +3061,15 @@ void iuse::bullet_puller(game *g, player *p, item *it, bool t)
 
 void iuse::boltcutters(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Cut up metal where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Cut where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Cut up metal where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg("Invalid direction.");
@@ -3009,9 +3101,15 @@ if (dirx == 0 && diry == 0) {
 
 void iuse::mop(game *g, player *p, item *it, bool t)
 {
+//CAT:
+// g->draw();
+// mvprintw(0, 0, "Mop where?");
+
+ //g->w_terrain->FG= 1;
+ mvwprintw(g->w_terrain, 0, 0, "Mop where?");
+ wrefresh(g->w_terrain);
+
  int dirx, diry;
- g->draw();
- mvprintw(0, 0, "Mop where?");
  get_direction(g, dirx, diry, input());
  if (dirx == -2) {
   g->add_msg_if_player(p,"Invalid direction.");

@@ -5,6 +5,10 @@ int
 nanosleep (const struct timespec *requested_delay,
            struct timespec *remaining_delay)
 {
+
+//CAT:
+return 0;
+
   static bool initialized;
   /* Number of performance counter increments per nanosecond,
      or zero if it could not be determined.  */
