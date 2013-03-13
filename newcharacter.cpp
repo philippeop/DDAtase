@@ -50,7 +50,12 @@ void save_template(player *u);
 bool player::create(game *g, character_type type, std::string tempname)
 {
  weapon = item(g->itypes[0], 0);
- WINDOW* w = newwin((g->VIEWY*2)+1, 80, 0, 0);
+
+ int iMaxX = (g->VIEWX < 12) ? 80 : (g->VIEWX*2)+56;
+ int iMaxY = (g->VIEWY < 12) ? 25 : (g->VIEWY*2)+1;
+
+ WINDOW* w = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+
  int tab = 0, points = 38;
  if (type != PLTYPE_CUSTOM) {
   switch (type) {
@@ -344,6 +349,7 @@ int set_stats(WINDOW* w, player *u, int &points)
              (u->throw_dex_mod(false) <= 0 ? "bonus" : "penalty"),
              (u->throw_dex_mod(false) <= 0 ? "+" : "-"),
              abs(u->throw_dex_mod(false)));
+   mvwprintz(w, 9, 33, COL_STAT_ACT, "                                            ");
    mvwprintz(w,10, 33, COL_STAT_ACT, "Dexterity also enhances many actions which  ");
    mvwprintz(w,11, 33, COL_STAT_ACT, "require finesse.                            ");
    mvwprintz(w,12, 33, COL_STAT_ACT, "                                            ");
@@ -358,10 +364,12 @@ int set_stats(WINDOW* w, player *u, int &points)
    mvwprintz(w, 7,  2, c_ltgray,     "Dexterity:    %d  ", u->dex_max);
    mvwprintz(w, 8,  2, COL_STAT_ACT, "Intelligence: %d  ", u->int_max);
    mvwprintz(w, 9,  2, c_ltgray,     "Perception:   %d  ", u->per_max);
+
    mvwprintz(w, 6, 33, COL_STAT_ACT, "Skill comprehension: %d%%%%                     ",
              u->skillLevel("melee").comprehension(u->int_max));
    mvwprintz(w, 7, 33, COL_STAT_ACT, "Read times: %d%%%%                              ",
              u->read_speed(false));
+   mvwprintz(w, 8, 33, COL_STAT_ACT, "                                            ");
    mvwprintz(w, 9, 33, COL_STAT_ACT, "Intelligence is also used when crafting,    ");
    mvwprintz(w,10, 33, COL_STAT_ACT, "installing bionics, and interacting with    ");
    mvwprintz(w,11, 33, COL_STAT_ACT, "NPCs.                                       ");
@@ -382,6 +390,7 @@ int set_stats(WINDOW* w, player *u, int &points)
              (u->ranged_per_mod(false) <= 0 ? "bonus" : "penalty"),
              (u->ranged_per_mod(false) <= 0 ? "+" : "-"),
              abs(u->ranged_per_mod(false)));
+   mvwprintz(w, 7, 33, COL_STAT_ACT, "                                            ");
    mvwprintz(w, 8, 33, COL_STAT_ACT, "Perception is also used for detecting       ");
    mvwprintz(w, 9, 33, COL_STAT_ACT, "traps and other things of interest.         ");
    mvwprintz(w,10, 33, COL_STAT_ACT, "                                            ");
@@ -456,8 +465,7 @@ int set_traits(WINDOW* w, player *u, int &points)
 {
  draw_tabs(w, "TRAITS");
 
- WINDOW* w_description = newwin(3, 78, 21, 1);
-
+ WINDOW* w_description = newwin(3, 78, 21 + getbegy(w), 1 + getbegx(w));
 // Track how many good / bad POINTS we have; cap both at MAX_TRAIT_POINTS
  int num_good = 0, num_bad = 0;
  for (int i = 0; i < PF_SPLIT; i++) {
@@ -654,7 +662,7 @@ int set_skills(WINDOW* w, player *u, int &points)
 {
  draw_tabs(w, "SKILLS");
 
- WINDOW* w_description = newwin(3, 78, 21, 1);
+ WINDOW* w_description = newwin(3, 78, 21 + getbegy(w), 1 + getbegx(w));
 
  int cur_sk = 1;
  Skill *currentSkill = Skill::skill(cur_sk);

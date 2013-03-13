@@ -225,9 +225,9 @@ void iuse::bandage(game *g, player *p, item *it, bool t)
         dam = 4 + bonus * 1.5;
     } else {
         dam = 3 + bonus;
+    }
         p->heal(healed, dam);
     }
-}
 
 void iuse::firstaid(game *g, player *p, item *it, bool t)
 {
@@ -379,9 +379,9 @@ void iuse::firstaid(game *g, player *p, item *it, bool t)
         dam = 18 + bonus * 1.5;
     } else {
         dam = 14 + bonus;
+    }
         p->heal(healed, dam);
     }
-}
 
 // Aspirin
 void iuse::pkill_1(game *g, player *p, item *it, bool t)
@@ -1429,8 +1429,6 @@ void iuse::makemound(game *g, player *p, item *it, bool t)
 
 void iuse::dig(game *g, player *p, item *it, bool t)
 {
-//CAT: hmmm...
-
  g->add_msg_if_player(p,"You can dig a pit via the construction menu--hit *");
 /*
  int dirx, diry;
@@ -1557,11 +1555,6 @@ void iuse::jacqueshammer(game *g, player *p, item *it, bool t)
 
 void iuse::pickaxe(game *g, player *p, item *it, bool t)
 {
-//CAT: hmmm...
-  g->add_msg_if_player(p,"Whoa buddy! You can't go cheating in items and");
-  g->add_msg_if_player(p,"just expect them to work! Now put the pickaxe");
-  g->add_msg_if_player(p,"down and go play the game.");
-
 /* int dirx, diry;
  g->draw();
  mvprintw(0, 0, "Drill in which direction?");
@@ -1589,7 +1582,6 @@ void iuse::pickaxe(game *g, player *p, item *it, bool t)
   g->add_msg_if_player(p,"just expect them to work! Now put the pickaxe");
   g->add_msg_if_player(p,"down and go play the game.");
 }
-
 void iuse::set_trap(game *g, player *p, item *it, bool t)
 {
 //CAT:
