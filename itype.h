@@ -40,14 +40,14 @@ itm_fire, itm_toolset, itm_apparatus,
 // Drinks
 itm_water, itm_water_clean, itm_sewage, itm_salt_water, itm_oj, itm_apple_cider,
  itm_energy_drink, itm_cola, itm_rootbeer, itm_milk, itm_V8, itm_broth,
- itm_soup, itm_whiskey, itm_vodka, itm_gin, itm_rum, itm_tequila, itm_triple_sec,
+ itm_soup_veggy, itm_soup_meat, itm_whiskey, itm_vodka, itm_gin, itm_rum, itm_tequila, itm_triple_sec,
  itm_long_island, itm_beer, itm_bleach,
  itm_ammonia, itm_mutagen, itm_purifier, itm_tea, itm_coffee, itm_blood,
 // Monster Meats
-itm_bone, itm_plant_sac, itm_meat, itm_veggy, itm_human_flesh, itm_veggy_wild, itm_meat_tainted, itm_veggy_tainted,
-itm_meat_cooked, itm_veggy_cooked, itm_veggy_wild_cooked,
+ itm_bone, itm_plant_sac, itm_meat, itm_veggy, itm_human_flesh, itm_veggy_wild, itm_meat_tainted, itm_veggy_tainted,
+ itm_meat_cooked, itm_veggy_cooked, itm_veggy_wild_cooked,
 // Food
-itm_apple, itm_orange, itm_lemon, itm_chips, itm_chips2, itm_chips3,
+ itm_apple, itm_orange, itm_lemon, itm_chips, itm_chips2, itm_chips3,
  itm_pretzels, itm_chocolate,
  itm_jerky, itm_sandwich_t, itm_candy, itm_mushroom, itm_mushroom_poison,
  itm_mushroom_magic, itm_blueberries, itm_strawberries, itm_tomato,
@@ -58,7 +58,7 @@ itm_apple, itm_orange, itm_lemon, itm_chips, itm_chips2, itm_chips3,
  itm_can_tuna, itm_can_catfood, itm_honeycomb, itm_wax, itm_royal_jelly, itm_fetus,
  itm_arm, itm_leg, itm_ant_egg, itm_marloss_berry, itm_flour, itm_sugar,
  itm_salt, itm_potato_raw, itm_potato_baked, itm_bread, itm_pie, itm_pizza,
- itm_mre_beef, itm_mre_veggy, itm_tea_raw, itm_coffee_raw,
+ itm_mre_beef, itm_mre_veggy, itm_tea_raw, itm_coffee_raw, itm_jihelucake,
 // Medication
 itm_bandages, itm_1st_aid, itm_vitamins, itm_aspirin, itm_caffeine,
  itm_pills_sleep, itm_iodine, itm_dayquil, itm_nyquil, itm_inhaler, itm_codeine,
@@ -81,14 +81,14 @@ itm_wrapper, itm_withered, itm_syringe, itm_fur, itm_leather, itm_superglue,
  itm_canister_empty, itm_gold, itm_coal, itm_petrified_eye, itm_spiral_stone,
  itm_cane, itm_binoculars, itm_usb_drive,
  itm_mace, itm_morningstar, itm_pool_cue, itm_pool_ball, itm_candlestick,
- itm_carspike, itm_carblade, itm_wire, itm_wire_barbed, itm_rebar, itm_log,
+ itm_spike, itm_blade, itm_wire, itm_wire_barbed, itm_rebar, itm_log,
  itm_splinter, itm_skewer, itm_crackpipe, itm_torch_done,
  itm_spring, itm_lawnmower, itm_sheet, itm_broketent, itm_element,
  itm_television, itm_pilot_light, itm_toaster, itm_microwave, itm_laptop,
  itm_fan, itm_ceramic_plate, itm_ceramic_bowl, itm_ceramic_cup,
  itm_glass_plate, itm_glass_bowl, itm_glass, itm_tin_plate, itm_fork, itm_spork,
  itm_foon, itm_rag_bloody, itm_clock, itm_clockworks,
- itm_javelin,
+ itm_javelin, itm_rock_pot,
 // Vehicle parts
  itm_frame,
  itm_wheel, itm_wheel_wide, itm_wheel_bicycle, itm_wheel_motorbike, itm_wheel_small,
@@ -144,7 +144,7 @@ itm_ring, itm_necklace,
  itm_nail, itm_bb, itm_arrow_wood, itm_arrow_cf,
  itm_bolt_wood, itm_bolt_steel, itm_shot_bird, itm_shot_00, itm_shot_slug,
  itm_shot_he, itm_22_lr, itm_22_cb, itm_22_ratshot, itm_9mm, itm_9mmP,
- itm_9mmP2, itm_38_special, itm_38_super, itm_10mm, itm_40sw, itm_44magnum,
+ itm_9mmP2, itm_762_25, itm_38_special, itm_38_super, itm_10mm, itm_40sw, itm_44magnum,
  itm_45_acp, itm_45_jhp, itm_45_super, itm_57mm, itm_46mm, itm_762_m43,
  itm_762_m87, itm_223, itm_556, itm_556_incendiary, itm_270, itm_3006,
  itm_3006_incendiary, itm_308, itm_762_51, itm_762_51_incendiary,
@@ -162,10 +162,11 @@ itm_nailgun, itm_bbgun, itm_crossbow, itm_compbow, itm_longbow, itm_rifle_22,
  itm_rifle_9mm, itm_smg_9mm, itm_smg_45, itm_sig_mosquito, itm_sw_22,
  itm_glock_19, itm_usp_9mm, itm_sw_619, itm_taurus_38, itm_sig_40, itm_sw_610,
  itm_ruger_redhawk, itm_deagle_44, itm_usp_45, itm_m1911, itm_fn57, itm_hk_ucp,
+ itm_tokarev,
  itm_shotgun_sawn, itm_saiga_sawn, itm_shotgun_s, itm_shotgun_d,  itm_remington_870,
  itm_mossberg_500, itm_saiga_12, itm_american_180, itm_uzi, itm_tec9,
  itm_calico, itm_hk_mp5, itm_mac_10, itm_hk_ump45, itm_TDI, itm_fn_p90,
- itm_hk_mp7, itm_marlin_9a, itm_ruger_1022, itm_browning_blr,
+ itm_hk_mp7, itm_ppsh, itm_marlin_9a, itm_ruger_1022, itm_browning_blr,
  itm_remington_700, itm_sks, itm_ruger_mini, itm_savage_111f, itm_hk_g3,
  itm_hk_g36, itm_ak47, itm_fn_fal, itm_acr, itm_ar15, itm_m4a1, itm_scar_l,
  itm_scar_h, itm_steyr_aug, itm_m249, itm_v29, itm_ftk93, itm_nx17,
@@ -209,7 +210,7 @@ itm_lighter, itm_sewing_kit, itm_scissors, itm_hammer, itm_extinguisher,
  itm_dogfood, itm_boobytrap, itm_c4, itm_c4armed, itm_dog_whistle,
  itm_vacutainer, itm_welder, itm_cot, itm_rollmat, itm_xacto, itm_scalpel,
  itm_machete, itm_katana, itm_spear_knife, itm_rapier, itm_pike, itm_broadsword,
- itm_lawnmower_blade, itm_lawnmower_machete, itm_lawnmower_halberd, itm_knife_steak,
+ itm_makeshift_machete, itm_makeshift_halberd, itm_knife_steak,
  itm_knife_butcher, itm_knife_combat, itm_saw, itm_ax, itm_hacksaw,
  itm_tent_kit, itm_torch, itm_torch_lit, itm_candle, itm_candle_lit,
  itm_brazier, itm_puller, itm_press, itm_screwdriver, itm_wrench,
@@ -287,7 +288,7 @@ AT_NULL, AT_THREAD,
 AT_BATT, AT_PLUT,
 AT_NAIL, AT_BB, AT_BOLT, AT_ARROW,
 AT_SHOT,
-AT_22, AT_9MM, AT_38, AT_40, AT_44, AT_45,
+AT_22, AT_9MM, AT_762x25, AT_38, AT_40, AT_44, AT_45,
 AT_57, AT_46,
 AT_762, AT_223, AT_3006, AT_308,
 AT_40MM,
@@ -505,60 +506,63 @@ struct itype
 // Includes food drink and drugs
 struct it_comest : public itype
 {
- signed char quench;	// Many things make you thirstier!
- unsigned char nutr;	// Nutrition imparted
- unsigned char spoils;	// How long it takes to spoil (hours / 600 turns)
- unsigned char addict;	// Addictiveness potential
- unsigned char charges;	// Defaults # of charges (drugs, loaf of bread? etc)
- signed char stim;
- signed char healthy;
+    signed char quench;	// Many things make you thirstier!
+    unsigned char nutr;	// Nutrition imparted
+    unsigned char spoils;	// How long it takes to spoil (hours / 600 turns)
+    unsigned char addict;	// Addictiveness potential
+    unsigned char charges;	// Defaults # of charges (drugs, loaf of bread? etc)
+    signed char stim;
+    signed char healthy;
+    std::string comesttype; //FOOD, DRINK, MED
 
- signed char fun;	// How fun its use is
+    signed char fun;	// How fun its use is
 
- itype_id container;	// The container it comes in
- itype_id tool;		// Tool needed to consume (e.g. lighter for cigarettes)
+    itype_id container;	// The container it comes in
+    itype_id tool;		// Tool needed to consume (e.g. lighter for cigarettes)
 
- virtual bool is_food() { return true; }
-// virtual bool count_by_charges() { return charges >= 1 ; }
+    virtual bool is_food() { return true; }
+    // virtual bool count_by_charges() { return charges >= 1 ; }
 
- virtual bool count_by_charges()
- {
-  if (m1 == LIQUID) return true;
-  else
-  return charges > 1 ;
- }
+    virtual bool count_by_charges()
+    {
+        if (m1 == LIQUID) {
+            return true;
+        } else {
+            return charges > 1 ;
+        }
+    }
 
+    void (iuse::*use)(game *, player *, item *, bool);// Special effects of use
+    add_type add;				// Effects of addiction
 
- void (iuse::*use)(game *, player *, item *, bool);// Special effects of use
- add_type add;				// Effects of addiction
+    it_comest(int pid, unsigned char prarity, unsigned int pprice,
+    std::string pname, std::string pdes,
+    char psym, nc_color pcolor, material pm1,
+    unsigned short pvolume, unsigned short pweight,
+    signed char pmelee_dam, signed char pmelee_cut,
+    signed char pm_to_hit, unsigned pitem_flags,
 
- it_comest(int pid, unsigned char prarity, unsigned int pprice,
-           std::string pname, std::string pdes,
-           char psym, nc_color pcolor, material pm1,
-           unsigned short pvolume, unsigned short pweight,
-           signed char pmelee_dam, signed char pmelee_cut,
-           signed char pm_to_hit, unsigned pitem_flags,
-
-           signed char pquench, unsigned char pnutr, signed char pspoils,
-           signed char pstim, signed char phealthy, unsigned char paddict,
-           unsigned char pcharges, signed char pfun, itype_id pcontainer,
-           itype_id ptool, void (iuse::*puse)(game *, player *, item *, bool),
-           add_type padd)
-:itype(pid, prarity, pprice, pname, pdes, psym, pcolor, pm1, MNULL,
-       pvolume, pweight, pmelee_dam, pmelee_cut, pm_to_hit, pitem_flags) {
-  quench = pquench;
-  nutr = pnutr;
-  spoils = pspoils;
-  stim = pstim;
-  healthy = phealthy;
-  addict = paddict;
-  charges = pcharges;
-  fun = pfun;
-  container = pcontainer;
-  tool = ptool;
-  use = puse;
-  add = padd;
- }
+    signed char pquench, unsigned char pnutr, signed char pspoils,
+    signed char pstim, signed char phealthy, unsigned char paddict,
+    unsigned char pcharges, signed char pfun, itype_id pcontainer,
+    itype_id ptool, void (iuse::*puse)(game *, player *, item *, bool),
+    add_type padd, std::string pcomesttype)
+    :itype(pid, prarity, pprice, pname, pdes, psym, pcolor, pm1, MNULL,
+    pvolume, pweight, pmelee_dam, pmelee_cut, pm_to_hit, pitem_flags) {
+        quench = pquench;
+        nutr = pnutr;
+        spoils = pspoils;
+        stim = pstim;
+        healthy = phealthy;
+        addict = paddict;
+        charges = pcharges;
+        fun = pfun;
+        container = pcontainer;
+        tool = ptool;
+        use = puse;
+        add = padd;
+        comesttype = pcomesttype;
+    }
 };
 
 // v6, v8, wankel, etc.

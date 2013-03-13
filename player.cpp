@@ -3248,36 +3248,45 @@ void player::add_morale(morale_type type, int bonus, int max_bonus,
 
 void player::sort_inv()
 {
- // guns ammo weaps armor food tools books other
- std::vector< std::vector<item> > types[9];
- std::vector<item> tmp;
- for (int i = 0; i < inv.size(); i++) {
-  tmp = inv.stack_at(i);
-  if (tmp[0].is_gun())
-   types[0].push_back(tmp);
-  else if (tmp[0].is_ammo())
-   types[1].push_back(tmp);
-  else if (tmp[0].is_weap())
-   types[2].push_back(tmp);
-  else if (tmp[0].is_tool())
-   types[3].push_back(tmp);
-  else if (tmp[0].is_armor())
-   types[4].push_back(tmp);
-  else if (tmp[0].is_food() || tmp[0].is_food_container())
-   types[5].push_back(tmp);
-  else if (tmp[0].is_book())
-   types[6].push_back(tmp);
-  else if (tmp[0].is_gunmod() || tmp[0].is_bionic())
-   types[7].push_back(tmp);
-  else
-   types[8].push_back(tmp);
- }
- inv.clear();
- for (int i = 0; i < 9; i++) {
-  for (int j = 0; j < types[i].size(); j++)
-   inv.push_back(types[i][j]);
- }
- inv_sorted = true;
+    // guns ammo weaps armor food med tools books other
+    std::vector< std::vector<item> > types[10];
+    std::vector<item> tmp;
+    for (int i = 0; i < inv.size(); i++) {
+        tmp = inv.stack_at(i);
+        if (tmp[0].is_gun()) {
+            types[0].push_back(tmp);
+        } else if (tmp[0].is_ammo()) {
+            types[1].push_back(tmp);
+        } else if (tmp[0].is_weap()) {
+            types[2].push_back(tmp);
+        } else if (tmp[0].is_tool()) {
+            types[3].push_back(tmp);
+        } else if (tmp[0].is_armor()) {
+            types[4].push_back(tmp);
+        } else if (tmp[0].is_food_container())  {
+            types[5].push_back(tmp);
+        } else if (tmp[0].is_food()) {
+            it_comest* comest = dynamic_cast<it_comest*>(tmp[0].type);
+            if (comest->comesttype != "MED") {
+                types[5].push_back(tmp);
+            } else {
+                types[6].push_back(tmp);
+            }
+        } else if (tmp[0].is_book()) {
+            types[7].push_back(tmp);
+        } else if (tmp[0].is_gunmod() || tmp[0].is_bionic()) {
+            types[8].push_back(tmp);
+        } else {
+            types[9].push_back(tmp);
+        }
+    }
+    inv.clear();
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < types[i].size(); j++) {
+            inv.push_back(types[i][j]);
+        }
+    }
+    inv_sorted = true;
 }
 
 void player::i_add(item it, game *g)
@@ -4000,9 +4009,12 @@ bool player::eat(game *g, int index)
     g->add_msg("Carnivore %s tried to eat meat!", name.c_str());
    return false;
   }
+  if (!has_trait(PF_CANNIBAL) && eaten->made_of(HFLESH)&& !is_npc() &&
+      !query_yn("The thought of eating that makes you feel sick. Really do it?"))
+   return false;
 
   if (has_trait(PF_VEGETARIAN) && eaten->made_of(FLESH) && !is_npc() &&
-      !query_yn("Really eat that meat? (The poor animals!)"))
+      !query_yn("Really eat that meat? Your stomach won't be happy."))
    return false;
 
   if (spoiled) {
@@ -4066,9 +4078,14 @@ bool player::eat(game *g, int index)
   if (has_bionic(bio_ethanol) && comest->use == &iuse::alcohol)
    charge_power(rng(2, 8));
 
+  if (!has_trait(PF_CANNIBAL)  && eaten->made_of(HFLESH)) {
+   if (!is_npc())
+    g->add_msg("You feel horrible for eating a person..");
+   add_morale(MORALE_CANNIBAL, -150, -1000);
+  }
   if (has_trait(PF_VEGETARIAN) && eaten->made_of(FLESH)) {
    if (!is_npc())
-    g->add_msg("You feel bad about eating this meat...");
+    g->add_msg("Almost instantly you feel a familiar pain in your stomach");
    add_morale(MORALE_VEGETARIAN, -75, -400);
   }
   if ((has_trait(PF_HERBIVORE) || has_trait(PF_RUMINANT)) &&
