@@ -272,7 +272,7 @@ std::ifstream fin;
 fin.open("data\\FONTDATA");
  if (!fin.is_open()){
      MessageBox(WindowHandle, "Failed to open FONTDATA, loading defaults.",
-                NULL, 0);
+                NULL, NULL);
      fontheight=16;
      fontwidth=8;
  } else {
@@ -283,7 +283,7 @@ fin.open("data\\FONTDATA");
      fin >> fontheight;
      if ((fontwidth <= 4) || (fontheight <=4)){
          MessageBox(WindowHandle, "Invalid font size specified!",
-                    NULL, 0);
+                    NULL, NULL);
         fontheight=16;
         fontwidth=8;
      }
@@ -292,10 +292,8 @@ fin.open("data\\FONTDATA");
     halfheight=fontheight / 2;
     WindowWidth= (55 + (OPTIONS[OPT_VIEWPORT_X] * 2 + 1)) * fontwidth;
     WindowHeight= (OPTIONS[OPT_VIEWPORT_Y] * 2 + 1) *fontheight;
-//CAT:
-    WindowX= 10; //(GetSystemMetrics(SM_CXSCREEN) / 2)-WindowWidth/2;    //center this
+    WindowX= 10; //(GetSystemMetrics(SM_CXSCREEN) / 2)-WindowWidth/2;    //center this //CAT
     WindowY= 400; //(GetSystemMetrics(SM_CYSCREEN) / 2)-WindowHeight/2;   //sucker
-
     WinCreate();    //Create the actual window, register it, etc
     CheckMessages();    //Let the message queue handle setting up the window
     WindowDC = GetDC(WindowHandle);
@@ -321,7 +319,7 @@ fin.open("data\\FONTDATA");
 
   } else {
       MessageBox(WindowHandle, "Failed to load default font, using FixedSys.",
-                NULL, 0);
+                NULL, NULL);
        font = CreateFont(fontheight, fontwidth, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                       ANSI_CHARSET, OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,
                       PROOF_QUALITY, FF_MODERN, "FixedSys");   //Create our font
@@ -544,18 +542,13 @@ int werase(WINDOW *win)
     for (j=0; j<win->height; j++)
     {
      for (i=0; i<win->width; i++)   {
-
-//CAT:
-//	if(win->line[j].touched=true) {
-
-	     win->line[j].chars[i]=0;
-	     win->line[j].FG[i]=0;
-	     win->line[j].BG[i]=0;
-	}
-//     }
+     win->line[j].chars[i]=0;
+     win->line[j].FG[i]=0;
+     win->line[j].BG[i]=0;
+     }
         win->line[j].touched=true;
     }
-
+//CAT
 //    win->draw=true;
 //    wmove(win,0,0);
 //    wrefresh(win);
@@ -666,21 +659,15 @@ int start_color(void)
  colorpairs=new pairs[50];
  windowsPalette=new RGBQUAD[16]; //Colors in the struct are BGR!! not RGB!!
  windowsPalette[0]= BGR(0,0,0); // Black
- windowsPalette[1]= BGR(0, 0, 200); // Red
-
-//CAT
- windowsPalette[2]= BGR(0,150,0); // Green
- windowsPalette[3]= BGR(50,90,170); // Brown???
- windowsPalette[4]= BGR(200, 0, 0); // Blue
-
+ windowsPalette[1]= BGR(0, 0, 255); // Red
+ windowsPalette[2]= BGR(0,100,0); // Green
+ windowsPalette[3]= BGR(23,51,92); // Brown???
+ windowsPalette[4]= BGR(150, 0, 0); // Blue
  windowsPalette[5]= BGR(98, 58, 139); // Purple
  windowsPalette[6]= BGR(180, 150, 0); // Cyan
  windowsPalette[7]= BGR(196, 196, 196);// Gray
-
-//CAT:
- windowsPalette[8]= BGR(90, 90, 90);// Dark Gray
- windowsPalette[9]= BGR(100, 100, 255); // Light Red/Salmon?
-
+ windowsPalette[8]= BGR(77, 77, 77);// Dark Gray
+ windowsPalette[9]= BGR(150, 150, 255); // Light Red/Salmon?
  windowsPalette[10]= BGR(0, 255, 0); // Bright Green
  windowsPalette[11]= BGR(0, 255, 255); // Yellow
  windowsPalette[12]= BGR(255, 100, 100); // Light Blue

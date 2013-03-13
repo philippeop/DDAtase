@@ -114,7 +114,7 @@ void iuse::bandage(game *g, player *p, item *it, bool t)
             int temporary_bonus = bonus;
             if (current_hp != 0) {
                 switch (hp_part(i)) {
-                    case hp_head: 
+                    case hp_head:
                         current_hp += 1;
                         temporary_bonus *=  .8;
                         break;
@@ -226,8 +226,8 @@ void iuse::bandage(game *g, player *p, item *it, bool t)
     } else {
         dam = 3 + bonus;
     }
-        p->heal(healed, dam);
-    }
+    p->heal(healed, dam);
+}
 
 void iuse::firstaid(game *g, player *p, item *it, bool t)
 {
@@ -268,7 +268,7 @@ void iuse::firstaid(game *g, player *p, item *it, bool t)
             int temporary_bonus = bonus;
             if (current_hp != 0) {
                 switch (hp_part(i)) {
-                    case hp_head: 
+                    case hp_head:
                         current_hp += 10;
                         temporary_bonus *=  .8;
                         break;
@@ -380,8 +380,8 @@ void iuse::firstaid(game *g, player *p, item *it, bool t)
     } else {
         dam = 14 + bonus;
     }
-        p->heal(healed, dam);
-    }
+    p->heal(healed, dam);
+}
 
 // Aspirin
 void iuse::pkill_1(game *g, player *p, item *it, bool t)

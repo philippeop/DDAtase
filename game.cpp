@@ -111,9 +111,6 @@ void game::init_ui(){
  werase(w_HP);
  w_moninfo = newwin(12, 48, 0, VIEWX * 2 + 8);
  werase(w_moninfo);
-
-//CAT
-// w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
  w_messages = newwin(8, 48, 12, VIEWX * 2 + 8);
  werase(w_messages);
  w_location = newwin(1, 48, 20, VIEWX * 2 + 8);
@@ -208,21 +205,21 @@ void game::print_menu(WINDOW* w_open, int iSel, const int iMenuOffsetX, int iMen
  mvwprintz(w_open, iLine++, iOffsetX1, cColor1, "        \\/      \\/             \\/      \\/        \\/          \\/       \\/ ");
 
  if (bShowDDA) {
- iLine++;
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "________                    __     ________                           ");
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "\\______ \\  _____   _______ |  | __ \\______ \\  _____    ___.__.  ______");
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, " |    |  \\ \\__  \\  \\_  __ \\|  |/ /  |    |  \\ \\__  \\  <   |  | /  ___/");
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, " |    `   \\ / __ \\_ |  | \\/|    <   |    `   \\ / __ \\_ \\___  | \\___ \\ ");
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "/_______  /(____  / |__|   |__|_ \\ /_______  /(____  / / ____|/____  >");
- mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "        \\/      \\/              \\/         \\/      \\/  \\/          \\/ ");
+  iLine++;
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "________                    __     ________                           ");
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "\\______ \\  _____   _______ |  | __ \\______ \\  _____    ___.__.  ______");
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, " |    |  \\ \\__  \\  \\_  __ \\|  |/ /  |    |  \\ \\__  \\  <   |  | /  ___/");
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, " |    `   \\ / __ \\_ |  | \\/|    <   |    `   \\ / __ \\_ \\___  | \\___ \\ ");
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "/_______  /(____  / |__|   |__|_ \\ /_______  /(____  / / ____|/____  >");
+  mvwprintz(w_open, iLine++, iOffsetX2, cColor2, "        \\/      \\/              \\/         \\/      \\/  \\/          \\/ ");
 
- iLine++;
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "   _____   .__                         .___");
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "  /  _  \\  |  |__    ____  _____     __| _/");
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, " /  /_\\  \\ |  |  \\ _/ __ \\ \\__  \\   / __ | ");
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "/    |    \\|   Y  \\\\  ___/  / __ \\_/ /_/ | ");
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "\\____|__  /|___|  / \\___  >(____  /\\____ | ");
- mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "        \\/      \\/      \\/      \\/      \\/ ");
+  iLine++;
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "   _____   .__                         .___");
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "  /  _  \\  |  |__    ____  _____     __| _/");
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, " /  /_\\  \\ |  |  \\ _/ __ \\ \\__  \\   / __ | ");
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "/    |    \\|   Y  \\\\  ___/  / __ \\_/ /_/ | ");
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "\\____|__  /|___|  / \\___  >(____  /\\____ | ");
+  mvwprintz(w_open, iLine++, iOffsetX3, cColor3, "        \\/      \\/      \\/      \\/      \\/ ");
  }
 
  mvwprintz(w_open, iMenuOffsetY++, iMenuOffsetX, (iSel == 0 ? h_white : c_white), "MOTD");
@@ -649,8 +646,6 @@ void game::create_starting_npcs()
 }
 
 void game::cleanup_at_end(){
-
-//CAT: check this
  write_msg();
 
  // Save the monsters before we die!
@@ -783,7 +778,6 @@ bool game::do_turn()
 
  if (u.has_disease(DI_SLEEP) && int(turn) % 300 == 0) {
   draw();
-//CAT: check this
   refresh();
  }
 
@@ -3029,8 +3023,6 @@ void game::refresh_all()
  draw_HP();
  wrefresh(w_moninfo);
  wrefresh(w_messages);
-
-//CAT: needed on Lin but not Win, hmmm...
  refresh();
 }
 
@@ -3101,9 +3093,8 @@ void game::draw_HP()
 
 void game::draw_minimap()
 {
-//CAT: needed on Lin but not Win, hmmm...
+ // Draw the box
  werase(w_minimap);
-
  mvwputch(w_minimap, 0, 0, c_white, LINE_OXXO);
  mvwputch(w_minimap, 0, 6, c_white, LINE_OOXX);
  mvwputch(w_minimap, 6, 0, c_white, LINE_XXOO);
@@ -4452,7 +4443,6 @@ void game::open()
  //w_terrain->FG= 1;
  mvwprintw(w_terrain, 0, 0, "Open where?");
  wrefresh(w_terrain);
-
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int openx, openy;
  InputEvent input = get_input();
@@ -4505,7 +4495,6 @@ void game::close()
  //w_terrain->FG= 1;
  mvwprintw(w_terrain, 0, 0, "Close where?");
  wrefresh(w_terrain);
-
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int closex, closey;
  InputEvent input = get_input();
@@ -4549,7 +4538,6 @@ void game::smash()
  //w_terrain->FG= 1;
  mvwprintw(w_terrain, 0, 0, "Smash what?");
  wrefresh(w_terrain);
-
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  InputEvent input = get_input();
  last_action += input;
@@ -4968,7 +4956,6 @@ void game::examine()
  //w_terrain->FG= 1;
  mvwprintw(w_terrain, 0, 0, "Examine where?");
  wrefresh(w_terrain);
-
  DebugLog() << __FUNCTION__ << "calling get_input() \n";
  int examx, examy;
  InputEvent input = get_input();
@@ -5945,10 +5932,7 @@ void game::list_items()
 void game::pickup(int posx, int posy, int min)
 {
  item_exchanges_since_save += 1; // Keeping this simple.
-
-//CAT: check this
  write_msg();
-
  if (u.weapon.type->id == itm_bio_claws) {
   add_msg("You cannot pick up items with your claws out!");
   return;
@@ -6324,9 +6308,9 @@ bool game::handle_liquid(item &liquid, bool from_ground, bool infinite)
 
    // Ask to pour rotten liquid (milk!) from the get-go
   if (!from_ground && liquid.rotten(this) &&
-            query_yn("Pour %s on the ground?", liquid.tname(this).c_str())) {
-  m.add_item(u.posx, u.posy, liquid);
-  return true;
+      query_yn("Pour %s on the ground?", liquid.tname(this).c_str())) {
+   m.add_item(u.posx, u.posy, liquid);
+   return true;
   }
 
   std::stringstream text;
@@ -6822,8 +6806,6 @@ void game::plfire(bool burst)
 
   u.weapon.reload(u, reload_index);
   u.moves -= u.weapon.reload_time(u);
-
-//CAT: check this...
   refresh_all();
  }
 
@@ -7533,13 +7515,13 @@ void game::pldrive(int x, int y) {
    u.practice("driving", 1);
 
 //CAT:
-	float cat_vel= veh->velocity*1.5;
-	if(cat_vel > 10000) cat_vel= 10000;
-	float cat_sin = sin(veh->turn_dir*M_PI/180)* cat_vel;
-	float cat_cos = cos(veh->turn_dir*M_PI/180)* cat_vel;
+   float cat_vel= veh->velocity*1.5;
+   if(cat_vel > 10000) cat_vel= 10000;
+   float cat_sin = sin(veh->turn_dir*M_PI/180)* cat_vel;
+   float cat_cos = cos(veh->turn_dir*M_PI/180)* cat_vel;
 
-		u.view_offset_y= (int)cat_sin/1000;
-		u.view_offset_x= (int)cat_cos/1000;
+   u.view_offset_y= (int)cat_sin/1000;
+   u.view_offset_x= (int)cat_cos/1000;
 }
 
 void game::plmove(int x, int y)
@@ -8725,19 +8707,17 @@ void game::write_msg()
    mesSS << mes << " x " << messages[i].count;
    mes = mesSS.str();
   }
-
-//CAT:	
 // Split the message into many if we must!
   size_t split;
   while (mes.length() > maxlength && line >= 0) {
    split = mes.find_last_of(' ', maxlength);
    if (split > maxlength)
     split = maxlength;
-   nc_color col = c_ltgray;
+   nc_color col = c_dkgray;
    if (int(messages[i].turn) >= curmes)
-    col = c_yellow;
-   else if (int(messages[i].turn) + 4 > curmes)
-    col = c_white;
+    col = c_ltred;
+   else if (int(messages[i].turn) + 5 >= curmes)
+    col = c_ltgray;
    //mvwprintz(w_messages, line, 0, col, mes.substr(0, split).c_str());
    mvwprintz(w_messages, line, 0, col, mes.substr(split + 1).c_str());
    mes = mes.substr(0, split);
@@ -8745,17 +8725,15 @@ void game::write_msg()
    //mes = mes.substr(split + 1);
   }
   if (line >= 0) {
-   nc_color col = c_ltgray;
+   nc_color col = c_dkgray;
    if (int(messages[i].turn) >= curmes)
-    col = c_yellow;
-   else if (int(messages[i].turn) + 4 > curmes)
-    col = c_white;
+    col = c_ltred;
+   else if (int(messages[i].turn) + 5 >= curmes)
+    col = c_ltgray;
    mvwprintz(w_messages, line, 0, col, mes.c_str());
    line--;
   }
  }
-//CAT:-END 
-
  curmes = int(turn);
  wrefresh(w_messages);
 }
