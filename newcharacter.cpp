@@ -212,7 +212,7 @@ End of cheatery */
   itype_id ma_type;
   do {
    int choice = menu("Pick your style:",
-                     "Karate", "Judo", "Aikido", "Tai Chi", "Taekwando", NULL);
+                     "Karate", "Judo", "Aikido", "Tai Chi", "Taekwondo", NULL);
    if (choice == 1)
     ma_type = itm_style_karate;
    if (choice == 2)
@@ -222,7 +222,7 @@ End of cheatery */
    if (choice == 4)
     ma_type = itm_style_tai_chi;
    if (choice == 5)
-    ma_type = itm_style_taekwando;
+    ma_type = itm_style_taekwondo;
    item tmpitem = item(g->itypes[ma_type], 0);
    full_screen_popup(tmpitem.info(true).c_str());
   } while (!query_yn("Use this style?"));
@@ -820,17 +820,23 @@ To save this character as a template, press !.");
 
 
   if (ch == '>') {
-   if (points > 0)
-    mvwprintz(w,  3, 2, c_red, "\
-Points left: %d    You must use the rest of your points!", points);
-   else if (u->name.size() == 0) {
+   if (points > 0 && query_yn("Remaining points will be discarded, are you sure you want to proceed?")) {
+    if (u->name.size() == 0) {
+    mvwprintz(w, 6, 8, h_ltgray, "______NO NAME ENTERED!!!!_____");
+    noname = true;
+    wrefresh(w);
+    if (query_yn("Are you SURE you're finished? Your name will be randomly generated."))
+     u->pick_name();
+     return 1;
+     } else
+    return 1;
+  } else if (u->name.size() == 0)
     mvwprintz(w, 6, 8, h_ltgray, "______NO NAME ENTERED!!!!_____");
     noname = true;
     wrefresh(w);
     if (query_yn("Are you SURE you're finished? Your name will be randomly generated.")){
      u->pick_name();
      return 1;
-    }
    } else if (query_yn("Are you SURE you're finished?"))
     return 1;
    else

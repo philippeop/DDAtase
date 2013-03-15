@@ -1411,7 +1411,7 @@ ARMOR("steeltoed boots",5, 135,C_SHOES,	LEATHER,	STEEL,
 Leather boots with a steel toe. Extremely durable.\n\
 These boots are a perfect fit for you.");
 
-ARMOR("winter boots",   5, 140,C_SHOES,	PLASTIC,	WOOL,
+ARMOR("winter boots",   5, 140,C_SHOES,	WOOL,	PLASTIC,
     8,  7,  0, -1,  1,  0,  2,  1,  85,  0,	mfb(bp_feet), "\
 Cumbersome boots designed for warmth.\n\
 These boots are a perfect fit for you.");
@@ -1466,7 +1466,7 @@ ARMOR("ski pants",	60, 300,C_PANTS,	COTTON,		MNULL,
 A pair of pants meant for alpine skiing.");
 
 ARMOR("long underwear",	40, 200,C_PANTS,	COTTON,		MNULL,
-    4,  2, -3,  0,  0,  0,  0,  0,  30, 12,	mfb(bp_legs), "\
+    4,  2, -3,  0,  0,  0,  0,  0,  30,  0,	mfb(bp_legs), "\
 A pair of long underwear that help to maintain body temperature.");
 
 ARMOR("skirt",		75, 120,C_PANTS,	COTTON,		MNULL,
@@ -3598,6 +3598,11 @@ TOOL("radio (on)",	 0, 420,';', c_yellow,	PLASTIC, IRON,
     4,  2,  4,  0, -1, 100,100, 0,  8, AT_BATT, itm_radio,&iuse::radio_on, 0,"\
 This radio is turned on, and continually draining its batteries. It is\n\
 playing the broadcast being sent from any nearby radio towers.");
+
+TOOL("road map", 40, 10, ';', c_yellow, MNULL, MNULL,
+     1, 0, 0, 0, -1, 0, 0, 0, 0, AT_NULL, itm_null, &iuse::roadmap, 0, "\
+A road map. Use it to read points of interest, including, but not\n\
+limited to, location(s) of hospital(s) nearby.");
 
 TOOL("crowbar",		18, 130,';', c_ltblue,	IRON,	MNULL,
     4,  9, 16,  3,  2,  0,  0,  0,  0, AT_NULL,	itm_null, &iuse::crowbar, 0,"\
