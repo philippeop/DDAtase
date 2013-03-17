@@ -345,6 +345,153 @@ void player::update_morale()
  }
 }
 
+/* Here lies the intended effects of body temperature
+
+Assumption 1 : a naked person is comfortable at 31C/87.8F.
+Assumption 2 : a "lightly clothed" person is comfortable at 25C/77F.
+Assumption 3 : frostbite cannot happen above 0C temperature.*
+* In the current model, a naked person can get frostbite at 1C. This isn't true, but it's a compromise with using nice whole numbers.
+
+Here is a list of warmth values and the corresponding temperatures in which the player is comfortable, and in which the player is very cold.
+
+Warmth  Temperature (Comfortable)    Temperature (Very cold)    Notes
+0        31C /  87.8F                 1C /  33.8F               * Naked
+10       25C /  77.0F                -5C /  23.0F               * Lightly clothed
+20       19C /  66.2F               -11C /  12.2F
+30       13C /  55.4F               -17C /   1.4F
+40        7C /  44.6F               -23C /  -9.4F
+50        1C /  33.8F               -29C / -20.2F
+60       -5C /  23.0F               -35C / -31.0F
+70      -11C /  12.2F               -41C / -41.8F
+80      -17C /   1.4F               -47C / -52.6F
+90      -23C /  -9.4F               -53C / -63.4F
+100     -29C / -20.2F               -59C / -74.2F
+
+*/
+
+void player::update_bodytemp(game *g) // TODO bionics, diseases and humidity (not in yet) can affect body temp.
+{
+ // NOTE : visit weather.h for some details on the numbers used
+ // Converts temperature to Celsius/10(Wito plans on using degrees Kelvin later)
+ int Ctemperature = 100*(g->temperature - 32) * 5/9;
+ // Temperature norms
+ const int ambient_norm = 3100;
+ // This adjusts the temperature scale to match the bodytemp scale
+ int adjusted_temp = (Ctemperature - ambient_norm);
+ // Creative thinking for clean morale penalties: this gets incremented in the for loop and applied after the loop
+ int morale_pen = 0;
+ // Fetch the morale value of wetness for bodywetness
+ int bodywetness = 0;
+ for (int i = 0; bodywetness == 0 && i < morale.size(); i++)
+  if( morale[i].type == MORALE_WET ) {
+   bodywetness = abs(morale[i].bonus); // Make it positive, less confusing
+   break;
+  }
+ // Current temperature and converging temperature calculations
+ for (int i = 0 ; i < num_bp ; i++){
+  if (i == bp_eyes) continue; // Skip eyes
+  // Represents the fact that the body generates heat when it is cold. TODO : should this increase hunger?
+  float homeostasis_adjustement = (temp_cur[i] > BODYTEMP_NORM ? 40.0 : 60.0);
+  int clothing_warmth_adjustement = homeostasis_adjustement * (float)warmth(body_part(i)) * (1.0 - (float)bodywetness / 100.0);
+  // Disease name shorthand
+  int blister_pen = dis_type(DI_BLISTERS) + 1 + i, hot_pen  = dis_type(DI_HOT) + 1 + i;
+  int cold_pen = dis_type(DI_COLD)+ 1 + i, frost_pen = dis_type(DI_FROSTBITE) + 1 + i;
+  // Convergeant temperature is affected by ambient temperature, clothing warmth, and body wetness.
+  signed int temp_conv = BODYTEMP_NORM + adjusted_temp + clothing_warmth_adjustement;
+  // Fatigue also affects convergeant temperature
+  if (!has_disease(DI_SLEEP)) temp_conv -= 10*fatigue/6;
+  else {
+   int vpart = -1;
+   vehicle *veh = g->m.veh_at (posx, posy, vpart);
+   if      (g->m.ter(posx, posy) == t_bed)                       temp_conv += 1000;
+   else if (g->m.ter(posx, posy) == t_makeshift_bed)             temp_conv +=  500;
+   else if (g->m.tr_at(posx, posy) == tr_cot)                    temp_conv -=  500;
+   else if (g->m.tr_at(posx, posy) == tr_rollmat)                temp_conv -= 1000;
+   else if (veh && veh->part_with_feature (vpart, vpf_seat) >= 0) temp_conv +=  200;
+   else if (veh && veh->part_with_feature (vpart, vpf_bed) >= 0)  temp_conv +=  300;
+   else	temp_conv -= 2000;
+  }
+  // Convection heat sources : generates body heat, helps fight frostbite
+  int blister_count = 0; // If the counter is high, your skin starts to burn
+  for (int j = -6 ; j <= 6 ; j++){
+   for (int k = -6 ; k <= 6 ; k++){
+    // Bizarre workaround for g->u_see() and friends not taking const arguments.
+    int l = std::max(j, k);
+    int heat_intensity = 0;
+    if(g->m.field_at(posx + j, posy + k).type == fd_fire)
+     heat_intensity = g->m.field_at(posx + j, posy + k).density;
+    else if (g->m.tr_at(posx + j, posy + k) == tr_lava )
+      heat_intensity = 3;
+    if (heat_intensity > 0 && g->u_see(posx + j, posy + k, l)) {
+     // Ensure fire_dist >=1 to avoid divide-by-zero errors.
+     int fire_dist = std::max(1, std::max(j, k));
+     if (frostbite_timer[i] > 0) frostbite_timer[i] -= heat_intensity - fire_dist / 2;
+     temp_conv += 50 * heat_intensity / (fire_dist * fire_dist);
+     blister_count += heat_intensity / (fire_dist * fire_dist);
+    }
+   }
+  }
+  // TODO Balance bionics
+  // Bionic "Internal Climate Control" says it is effective from 0F to 140F, these are the corresponding bodytemp values
+  if (has_bionic(bio_climate) && g->temperature > 0 && g->temperature < 140)
+   temp_conv = (9*BODYTEMP_NORM + temp_conv)/10; // Bionic "eases" the effects
+  // Bionic "Thermal Dissapation" says it prevents fire damage up to 2000F. 500 is picked at random...
+  if (has_bionic(bio_heatsink) && blister_count < 500)
+   blister_count = 0;
+  // Skin gets blisters from intense heat exposure.
+  if (blister_count - 10*resist(body_part(i)) > 20) add_disease(dis_type(blister_pen), 1, g);
+  // Increments current body temperature towards convergant.
+  int temp_difference = temp_cur[i] - temp_conv;
+  int temp_before = temp_cur[i];
+  // Bodytemp equalization code
+  if      (i == bp_torso){temp_equalizer(bp_torso, bp_arms); temp_equalizer(bp_torso, bp_legs); temp_equalizer(bp_torso, bp_head);}
+  else if (i == bp_head) {temp_equalizer(bp_head, bp_eyes); temp_equalizer(bp_head, bp_mouth);}
+  else if (i == bp_arms)  temp_equalizer(bp_arms, bp_hands);
+  else if (i == bp_legs)  temp_equalizer(bp_legs, bp_feet);
+  if (temp_cur[i] != temp_conv) temp_cur[i] = temp_difference*exp(-0.002) + temp_conv; // It takes half an hour for bodytemp to converge half way to its convergeance point (think half-life)
+  int temp_after = temp_cur[i];
+  // Penalties
+  if      (temp_cur[i] < BODYTEMP_FREEZING)  {add_disease(dis_type(cold_pen), 1, g, 3, 3); frostbite_timer[i] += 3;}
+  else if (temp_cur[i] < BODYTEMP_VERY_COLD) {add_disease(dis_type(cold_pen), 1, g, 2, 3); frostbite_timer[i] += 2;}
+  else if (temp_cur[i] < BODYTEMP_COLD)      {add_disease(dis_type(cold_pen), 1, g, 1, 3); frostbite_timer[i] += 1;} // Frostbite timer does not go down if you are still cold.
+  else if (temp_cur[i] > BODYTEMP_SCORCHING) {add_disease(dis_type(hot_pen),  1, g, 3, 3); } // If body temp rises over 15000, disease.cpp (DI_HOT_HEAD) acts weird and the player will die
+  else if (temp_cur[i] > BODYTEMP_VERY_HOT)  {add_disease(dis_type(hot_pen),  1, g, 2, 3); }
+  else if (temp_cur[i] > BODYTEMP_HOT)       {add_disease(dis_type(hot_pen),  1, g, 1, 3); }
+  // Morale penalties : a negative morale_pen means the player is cold
+  // Intensity multiplier is negative for cold, positive for hot
+  int intensity_mult = -disease_intensity(dis_type(cold_pen)) + disease_intensity(dis_type(hot_pen));
+  if (has_disease(dis_type(cold_pen)) > 0 || has_disease(dis_type(hot_pen)) > 0) {
+   switch (i) {
+    case bp_head :
+    case bp_torso :
+    case bp_mouth : morale_pen += 2*intensity_mult;
+    case bp_arms :
+    case bp_legs : morale_pen += 1*intensity_mult;
+    case bp_hands:
+    case bp_feet : morale_pen += 1*intensity_mult;
+   }
+  }
+  // Frostbite (level 1 after 2 hours, level 2 after 4 hours)
+  if      (frostbite_timer[i] >   0) frostbite_timer[i]--;
+  if      (frostbite_timer[i] >= 240) {
+   if      (disease_intensity(dis_type(frost_pen)) < 2 &&  i == bp_mouth)                  g->add_msg("Your %s hardens from the frostbite!", body_part_name(body_part(i), -1).c_str());
+   else if (disease_intensity(dis_type(frost_pen)) < 2 && (i == bp_hands || i == bp_feet)) g->add_msg("Your %s harden from the frostbite!",  body_part_name(body_part(i), -1).c_str());
+   add_disease(dis_type(frost_pen), 1, g, 2, 2);}
+  else if (frostbite_timer[i] >= 120) {
+   if (!has_disease(dis_type(frost_pen))) g->add_msg("You lose sensation in your %s.", body_part_name(body_part(i), -1).c_str());
+   add_disease(dis_type(frost_pen), 1, g, 1, 2);}
+  // Warn the player if condition worsens
+  if      (temp_before > BODYTEMP_FREEZING  && temp_after < BODYTEMP_FREEZING)  g->add_msg("You feel your %s beginning to go numb from the cold!", body_part_name(body_part(i), -1).c_str());
+  else if (temp_before > BODYTEMP_VERY_COLD && temp_after < BODYTEMP_VERY_COLD) g->add_msg("You feel your %s getting very cold.", body_part_name(body_part(i), -1).c_str());
+  else if (temp_before > BODYTEMP_COLD      && temp_after < BODYTEMP_COLD)      g->add_msg("You feel your %s getting cold.", body_part_name(body_part(i), -1).c_str());
+  else if (temp_before < BODYTEMP_SCORCHING && temp_after > BODYTEMP_SCORCHING) g->add_msg("You feel your %s getting red hot from the heat!", body_part_name(body_part(i), -1).c_str());
+  else if (temp_before < BODYTEMP_VERY_HOT  && temp_after > BODYTEMP_VERY_HOT)  g->add_msg("You feel your %s getting very hot.", body_part_name(body_part(i), -1).c_str());
+  else if (temp_before < BODYTEMP_HOT       && temp_after > BODYTEMP_HOT)       g->add_msg("You feel your %s getting hot.", body_part_name(body_part(i), -1).c_str());
+  }
+ // Morale penalties, updated at the same rate morale is
+ if (morale_pen < 0 && int(g->turn) % 10 == 0) add_morale(MORALE_COLD, -2, -abs(morale_pen));
+ if (morale_pen > 0 && int(g->turn) % 10 == 0) add_morale(MORALE_HOT,  -2, -abs(morale_pen));
+}
 
 void player::temp_equalizer(body_part bp1, body_part bp2)
 {
@@ -1870,114 +2017,6 @@ void player::charge_power(int amount)
   power_level = max_power_level;
  if (power_level < 0)
   power_level = 0;
-}
-
-void player::power_bionics(game *g)
-{
- WINDOW *wBio = newwin(25, 80, 0, 0);
- werase(wBio);
- std::vector <bionic> passive;
- std::vector <bionic> active;
- mvwprintz(wBio, 0, 0, c_blue, "BIONICS -");
- mvwprintz(wBio, 0,10, c_white,
-           "Activating.  Press '!' to examine your implants.");
-
- for (int i = 0; i < 80; i++) {
-  mvwputch(wBio,  1, i, c_ltgray, LINE_OXOX);
-  mvwputch(wBio, 21, i, c_ltgray, LINE_OXOX);
- }
- for (int i = 0; i < my_bionics.size(); i++) {
-  if ( bionics[my_bionics[i].id].power_source ||
-      !bionics[my_bionics[i].id].activated      )
-   passive.push_back(my_bionics[i]);
-  else
-   active.push_back(my_bionics[i]);
- }
- nc_color type;
- if (passive.size() > 0) {
-  mvwprintz(wBio, 2, 0, c_ltblue, "Passive:");
-  for (int i = 0; i < passive.size(); i++) {
-   if (bionics[passive[i].id].power_source)
-    type = c_ltcyan;
-   else
-    type = c_cyan;
-   mvwputch(wBio, 3 + i, 0, type, passive[i].invlet);
-   mvwprintz(wBio, 3 + i, 2, type, bionics[passive[i].id].name.c_str());
-  }
- }
- if (active.size() > 0) {
-  mvwprintz(wBio, 2, 32, c_ltblue, "Active:");
-  for (int i = 0; i < active.size(); i++) {
-   if (active[i].powered)
-    type = c_red;
-   else
-    type = c_ltred;
-   mvwputch(wBio, 3 + i, 32, type, active[i].invlet);
-   mvwprintz(wBio, 3 + i, 34, type,
-             (active[i].powered ? "%s - ON" : "%s - %d PU / %d trns"),
-             bionics[active[i].id].name.c_str(),
-             bionics[active[i].id].power_cost,
-             bionics[active[i].id].charge_time);
-  }
- }
-
- wrefresh(wBio);
- char ch;
- bool activating = true;
- bionic *tmp;
- int b;
- do {
-  ch = getch();
-  if (ch == '!') {
-   activating = !activating;
-   if (activating)
-    mvwprintz(wBio, 0, 10, c_white,
-              "Activating.  Press '!' to examine your implants.");
-   else
-    mvwprintz(wBio, 0, 10, c_white,
-              "Examining.  Press '!' to activate your implants.");
-  } else if (ch == ' ')
-   ch = KEY_ESCAPE;
-  else if (ch != KEY_ESCAPE) {
-   for (int i = 0; i < my_bionics.size(); i++) {
-    if (ch == my_bionics[i].invlet) {
-     tmp = &my_bionics[i];
-     b = i;
-     ch = KEY_ESCAPE;
-    }
-   }
-   if (ch == KEY_ESCAPE) {
-    if (activating) {
-     if (bionics[tmp->id].activated) {
-      if (tmp->powered) {
-       tmp->powered = false;
-       g->add_msg("%s powered off.", bionics[tmp->id].name.c_str());
-      } else if (power_level >= bionics[tmp->id].power_cost ||
-                 (weapon.type->id == itm_bio_claws && tmp->id == bio_claws))
-       activate_bionic(b, g);
-     } else
-      mvwprintz(wBio, 22, 0, c_ltred, "\
-You can not activate %s!  To read a description of \
-%s, press '!', then '%c'.", bionics[tmp->id].name.c_str(),
-                            bionics[tmp->id].name.c_str(), tmp->invlet);
-    } else {	// Describing bionics, not activating them!
-// Clear the lines first
-     ch = 0;
-     mvwprintz(wBio, 22, 0, c_ltgray, "\
-                                                                               \
-                                                                               \
-                                                                             ");
-     mvwprintz(wBio, 22, 0, c_ltblue,
-               bionics[tmp->id].description.c_str());
-    }
-   }
-  }
-  wrefresh(wBio);
- } while (ch != KEY_ESCAPE);
- werase(wBio);
- wrefresh(wBio);
- delwin(wBio);
- erase();
 }
 
 float player::active_light()
