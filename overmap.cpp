@@ -261,36 +261,43 @@ void overmap::delete_note(int x, int y)
  }
 }
 
-point overmap::display_notes()
+point overmap::display_notes(game* g)
 {
  std::string title = "Notes:";
- WINDOW* w_notes = newwin(25, 80, 0, 0);
+ const int iMaxX = (g->VIEWX < 12) ? 80 : (g->VIEWX*2)+56;
+ const int iMaxY = (g->VIEWY < 12) ? 25 : (g->VIEWY*2)+1;
+
+ WINDOW* w_notes = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+
+ wborder(w_notes, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
+                  LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
+
  const int maxitems = 20;	// Number of items to show at one time.
  char ch = '.';
  int start = 0, cur_it;
- mvwprintz(w_notes, 0, 0, c_ltgray, title.c_str());
+ mvwprintz(w_notes, 1, 1, c_ltgray, title.c_str());
  do{
   if (ch == '<' && start > 0) {
    for (int i = 1; i < 25; i++)
-    mvwprintz(w_notes, i, 0, c_black, "                                                     ");
+    mvwprintz(w_notes, i+1, 1, c_black, "                                                     ");
    start -= maxitems;
    if (start < 0)
     start = 0;
-   mvwprintw(w_notes, maxitems + 2, 0, "         ");
+   mvwprintw(w_notes, maxitems + 2, 1, "         ");
   }
   if (ch == '>' && cur_it < notes.size()) {
    start = cur_it;
-   mvwprintw(w_notes, maxitems + 2, 12, "            ");
+   mvwprintw(w_notes, maxitems + 2, 13, "            ");
    for (int i = 1; i < 25; i++)
     mvwprintz(w_notes, i, 0, c_black, "                                                     ");
   }
-  int cur_line = 2;
+  int cur_line = 3;
   int last_line = -1;
   char cur_let = 'a';
   for (cur_it = start; cur_it < start + maxitems && cur_line < 23; cur_it++) {
    if (cur_it < notes.size()) {
-   mvwputch (w_notes, cur_line, 0, c_white, cur_let++);
-   mvwprintz(w_notes, cur_line, 2, c_ltgray, "- %s", notes[cur_it].text.c_str());
+   mvwputch (w_notes, cur_line, 1, c_white, cur_let++);
+   mvwprintz(w_notes, cur_line, 3, c_ltgray, "- %s", notes[cur_it].text.c_str());
    } else{
     last_line = cur_line - 2;
     break;
@@ -301,7 +308,7 @@ point overmap::display_notes()
   if(last_line == -1)
    last_line = 23;
   if (start > 0)
-   mvwprintw(w_notes, maxitems + 4, 0, "< Go Back");
+   mvwprintw(w_notes, maxitems + 4, 1, "< Go Back");
   if (cur_it < notes.size())
    mvwprintw(w_notes, maxitems + 4, 12, "> More notes");
   if(ch >= 'a' && ch <= 't'){
@@ -309,11 +316,11 @@ point overmap::display_notes()
    if(chosen_line < last_line)
     return point(notes[start + chosen_line].x, notes[start + chosen_line].y);
   }
-  mvwprintz(w_notes, 0, 40, c_white, "Press letter to center on note");
-  mvwprintz(w_notes, 24, 40, c_white, "Spacebar - Return to map  ");
+  mvwprintz(w_notes, 1, 40, c_white, "Press letter to center on note");
+  mvwprintz(w_notes, 23, 40, c_white, "Spacebar - Return to map  ");
   wrefresh(w_notes);
   ch = getch();
- } while(ch != ' ');
+ } while(ch != ' ' && ch != '\n' && ch != KEY_ESCAPE);
  delwin(w_notes);
  return point(-1,-1);
 }
@@ -588,7 +595,7 @@ void overmap::generate_sub(overmap* above)
    else if (above->ter(i, j) == ot_anthill) {
     int size = rng(MIN_ANT_SIZE, MAX_ANT_SIZE);
     ant_points.push_back(city(i, j, size));
-    zg.push_back(mongroup(mcat_ant, i * 2, j * 2, size * 1.5, rng(6000, 8000)));
+    zg.push_back(mongroup("GROUP_ANT", i * 2, j * 2, size * 1.5, rng(6000, 8000)));
 
    } else if (above->ter(i, j) == ot_slimepit_down) {
     int size = rng(MIN_GOO_SIZE, MAX_GOO_SIZE);
@@ -634,7 +641,7 @@ void overmap::generate_sub(overmap* above)
       ter(x, y) = ot_spiral;
     }
     ter(i, j) = ot_spiral_hub;
-    zg.push_back(mongroup(mcat_spiral, i * 2, j * 2, 2, 200));
+    zg.push_back(mongroup("GROUP_SPIRAL", i * 2, j * 2, 2, 200));
 
    } else if (above->ter(i, j) == ot_silo) {
     if (rng(2, 7) < abs(posz) || rng(2, 7) < abs(posz))
@@ -662,11 +669,11 @@ void overmap::generate_sub(overmap* above)
  for (int i = 0; i < above->cities.size(); i++) {
   if (one_in(3))
    zg.push_back(
-    mongroup(mcat_chud, above->cities[i].x * 2, above->cities[i].y * 2,
+    mongroup("GROUP_CHUD", above->cities[i].x * 2, above->cities[i].y * 2,
              above->cities[i].s, above->cities[i].s * 20));
   if (!one_in(8))
    zg.push_back(
-    mongroup(mcat_sewer, above->cities[i].x * 2, above->cities[i].y * 2,
+    mongroup("GROUP_SEWER", above->cities[i].x * 2, above->cities[i].y * 2,
              above->cities[i].s * 3.5, above->cities[i].s * 70));
  }
  place_rifts();
@@ -876,23 +883,23 @@ void overmap::draw(WINDOW *w, game *g, int &cursx, int &cursy,
   long ter_sym;
 /* First, determine if we're close enough to the edge to need to load an
  * adjacent overmap, and load it/them. */
-  if (cursx < om_map_height / 2) {
+  if (cursx < om_map_width / 2) {
    hori = overmap(g, posx - 1, posy, posz);
-   if (cursy < om_map_width / 2)
+   if (cursy < om_map_height / 2)
     diag = overmap(g, posx - 1, posy - 1, posz);
    if (cursy > OMAPY - 2 - (om_map_width / 2))
     diag = overmap(g, posx - 1, posy + 1, posz);
   }
-  if (cursx > OMAPX - 2 - (om_map_height / 2)) {
+  if (cursx > OMAPX - 2 - (om_map_width / 2)) {
    hori = overmap(g, posx + 1, posy, posz);
-   if (cursy < om_map_width / 2)
+   if (cursy < om_map_height / 2)
     diag = overmap(g, posx + 1, posy - 1, posz);
-   if (cursy > OMAPY - 2 - (om_map_width / 2))
+   if (cursy > OMAPY - 2 - (om_map_height / 2))
     diag = overmap(g, posx + 1, posy + 1, posz);
   }
-  if (cursy < (om_map_width / 2))
+  if (cursy < (om_map_height / 2))
    vert = overmap(g, posx, posy - 1, posz);
-  if (cursy > OMAPY - 2 - (om_map_width / 2))
+  if (cursy > OMAPY - 2 - (om_map_height / 2))
    vert = overmap(g, posx, posy + 1, posz);
 
 // Now actually draw the map
@@ -1120,7 +1127,7 @@ point overmap::choose_point(game *g)
    timeout(BLINK_SPEED);
   } else if (ch == 'L'){
    timeout(-1);
-   point p = display_notes();
+   point p = display_notes(g);
    if (p.x != -1){
     cursx = p.x;
     cursy = p.y;
@@ -1576,7 +1583,7 @@ void overmap::build_lab(int x, int y, int s)
                          ter(finalex, finaley) != ot_lab_core);
   ter(finalex, finaley) = ot_lab_finale;
  }
- zg.push_back(mongroup(mcat_lab, (x * 2), (y * 2), s, 400));
+ zg.push_back(mongroup("GROUP_LAB", (x * 2), (y * 2), s, 400));
 }
 
 void overmap::build_anthill(int x, int y, int s)
@@ -2305,7 +2312,7 @@ void overmap::place_special(overmap_special special, point p)
  }
 
 // Finally, place monsters if applicable
- if (special.monsters != mcat_null) {
+ if (special.monsters != "GROUP_NULL") {
   if (special.monster_pop_min == 0 || special.monster_pop_max == 0 ||
       special.monster_rad_min == 0 || special.monster_rad_max == 0   ) {
    debugmsg("Overmap special %s has bad spawn: pop(%d, %d) rad(%d, %d)",
@@ -2328,7 +2335,7 @@ void overmap::place_mongroups()
   // Cities are full of zombies
   for (unsigned int i = 0; i < cities.size(); i++) {
    if (!one_in(16) || cities[i].s > 5)
-    zg.push_back (mongroup(mcat_zombie, (cities[i].x * 2), (cities[i].y * 2),
+    zg.push_back (mongroup("GROUP_ZOMBIE", (cities[i].x * 2), (cities[i].y * 2),
                            int(cities[i].s * 2.5), cities[i].s * 80));
   }
  }
@@ -2346,7 +2353,7 @@ void overmap::place_mongroups()
     }
    }
    if (swamp_count >= 25) // ~25% swamp or ~50% river
-    zg.push_back(mongroup(mcat_swamp, x * 2, y * 2, 3,
+    zg.push_back(mongroup("GROUP_SWAMP", x * 2, y * 2, 3,
                           rng(swamp_count * 8, swamp_count * 25)));
   }
  }
@@ -2355,21 +2362,21 @@ void overmap::place_mongroups()
  int numgroups = rng(0, 3);
  for (int i = 0; i < numgroups; i++) {
   zg.push_back(
-	mongroup(mcat_worm, rng(0, OMAPX * 2 - 1), rng(0, OMAPY * 2 - 1),
+	mongroup("GROUP_WORM", rng(0, OMAPX * 2 - 1), rng(0, OMAPY * 2 - 1),
 	         rng(20, 40), rng(500, 1000)));
  }
 
 // Forest groups cover the entire map
- zg.push_back( mongroup(mcat_forest, OMAPX / 2, OMAPY / 2,
+ zg.push_back( mongroup("GROUP_FOREST", OMAPX / 2, OMAPY / 2,
                         OMAPY, rng(2000, 12000)));
  zg.back().diffuse = true;
- zg.push_back( mongroup(mcat_forest, OMAPX / 2, (OMAPY * 3) / 2,
+ zg.push_back( mongroup("GROUP_FOREST", OMAPX / 2, (OMAPY * 3) / 2,
                         OMAPY, rng(2000, 12000)));
  zg.back().diffuse = true;
- zg.push_back( mongroup(mcat_forest, (OMAPX * 3) / 2, OMAPY / 2,
+ zg.push_back( mongroup("GROUP_FOREST", (OMAPX * 3) / 2, OMAPY / 2,
                         OMAPX, rng(2000, 12000)));
  zg.back().diffuse = true;
- zg.push_back( mongroup(mcat_forest, (OMAPX * 3) / 2, (OMAPY * 3) / 2,
+ zg.push_back( mongroup("GROUP_FOREST", (OMAPX * 3) / 2, (OMAPY * 3) / 2,
                         OMAPX, rng(2000, 12000)));
  zg.back().diffuse = true;
 }
@@ -2465,6 +2472,7 @@ void overmap::open(game *g, int x, int y, int z)
  std::ifstream fin;
  char datatype;
  int ct, cx, cy, cs, cp, cd;
+ std::string cstr;
  city tmp;
  std::vector<item> npc_inventory;
 
@@ -2488,8 +2496,8 @@ void overmap::open(game *g, int x, int y, int z)
   }
   while (fin >> datatype) {
    if (datatype == 'Z') {	// Monster group
-    fin >> ct >> cx >> cy >> cs >> cp >> cd;
-    zg.push_back(mongroup(moncat_id(ct), cx, cy, cs, cp));
+    fin >> cstr >> cx >> cy >> cs >> cp >> cd;
+    zg.push_back(mongroup(cstr, cx, cy, cs, cp));
     zg.back().diffuse = cd;
     nummg++;
    } else if (datatype == 't') {	// City

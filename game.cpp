@@ -35,7 +35,6 @@
 
 void intro();
 nc_color sev(int a);	// Right now, ONLY used for scent debugging....
-moncat_id mt_to_mc(mon_id type);	// Pick the moncat that contains type
 
 // This is the main game set-up process.
 game::game() :
@@ -59,7 +58,7 @@ game::game() :
  init_traps();	      // Set up the trap types            (SEE trapdef.cpp)
  init_mapitems();     // Set up which items appear where  (SEE mapitemsdef.cpp)
  init_recipes();      // Set up crafting reciptes         (SEE crafting.cpp)
- init_moncats();      // Set up monster categories        (SEE mongroupdef.cpp)
+ init_mongroups();    // Set up monster groupings         (SEE mongroupdef.cpp)
  init_missions();     // Set up mission templates         (SEE missiondef.cpp)
  init_construction(); // Set up constructables            (SEE construction.cpp)
  init_mutations();
@@ -1156,8 +1155,8 @@ bool game::handle_action()
   case ACTION_INVENTORY: {
    bool has = false;
    char cMenu = ' ';
-   int iMaxX = 55 + ((VIEWX < 12) ? 25 : (VIEWX*2)+1);
-   int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+   const int iMaxX = 55 + ((VIEWX < 12) ? 25 : (VIEWX*2)+1);
+   const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
 
    do {
     const std::string sSpaces = "                              ";
@@ -1429,7 +1428,7 @@ bool game::handle_action()
    break;
 
   case ACTION_MORALE:
-   u.disp_morale();
+   u.disp_morale(this);
    refresh_all();
    break;
 
@@ -1551,8 +1550,16 @@ void game::death_screen()
     playerfile << "save/" << u.name << ".sav";
     unlink(playerfile.str().c_str());
 
-    WINDOW* w_death = newwin(TERMY, TERMX, 0, 0);
-    mvwprintz(w_death, 0, 35, c_red, "GAME OVER - Press Spacebar to Quit");
+    const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+    const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+    const std::string sText = "GAME OVER - Press Spacebar to Quit";
+
+    WINDOW *w_death = newwin(5, 6+sText.size(), (iMaxY-5)/2, (iMaxX+6-sText.size())/2);
+
+    wborder(w_death, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
+                     LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
+
+    mvwprintz(w_death, 2, 3, c_ltred, sText.c_str());
     wrefresh(w_death);
     refresh();
     InputEvent input;
@@ -2108,7 +2115,14 @@ void game::draw_overmap()
 
 void game::disp_kills()
 {
- WINDOW* w = newwin(TERMY, TERMX, 0, 0);
+ const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ WINDOW *w = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+
+ wborder(w, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
+            LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
+
  std::vector<mtype *> types;
  std::vector<int> count;
  for (int i = 0; i < num_monsters; i++) {
@@ -2118,7 +2132,7 @@ void game::disp_kills()
   }
  }
 
- mvwprintz(w, 0, 35, c_red, "KILL COUNTS:");
+ mvwprintz(w, 1, 35, c_red, "KILL COUNTS:");
 
  if (types.size() == 0) {
   mvwprintz(w, 2, 2, c_white, "You haven't killed any monsters yet!");
@@ -2133,8 +2147,7 @@ void game::disp_kills()
 
  for (int i = 0; i < types.size(); i++) {
   if (i < 24) {
-   mvwprintz(w, i + 1,  0, types[i]->color, "%c %s", types[i]->sym,
-             types[i]->name.c_str());
+   mvwprintz(w, i + 2, 1, types[i]->color, "%c %s", types[i]->sym, types[i]->name.c_str());
    int hori = 25;
    if (count[i] >= 10)
     hori = 24;
@@ -2142,10 +2155,9 @@ void game::disp_kills()
     hori = 23;
    if (count[i] >= 1000)
     hori = 22;
-   mvwprintz(w, i + 1, hori, c_white, "%d", count[i]);
+   mvwprintz(w, i + 2, hori, c_white, "%d", count[i]);
   } else {
-   mvwprintz(w, i + 1, 40, types[i]->color, "%c %s", types[i]->sym,
-             types[i]->name.c_str());
+   mvwprintz(w, i + 2, 40, types[i]->color, "%c %s", types[i]->sym, types[i]->name.c_str());
    int hori = 65;
    if (count[i] >= 10)
     hori = 64;
@@ -2153,7 +2165,7 @@ void game::disp_kills()
     hori = 63;
    if (count[i] >= 1000)
     hori = 62;
-   mvwprintz(w, i + 1, hori, c_white, "%d", count[i]);
+   mvwprintz(w, i + 2, hori, c_white, "%d", count[i]);
   }
  }
 
@@ -2167,7 +2179,11 @@ void game::disp_kills()
 
 void game::disp_NPCs()
 {
- WINDOW* w = newwin(25, 80, 0, 0);
+ const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ WINDOW *w = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+
  mvwprintz(w, 0, 0, c_white, "Your position: %d:%d", levx, levy);
  std::vector<npc*> closest;
  closest.push_back(&cur_om.npcs[0]);
@@ -2208,16 +2224,24 @@ faction* game::list_factions(std::string title)
   popup("You don't know of any factions.  Press Spacebar...");
   return NULL;
  }
- WINDOW* w_list = newwin(25,      MAX_FAC_NAME_SIZE, 0, 0);
- WINDOW* w_info = newwin(25, 80 - MAX_FAC_NAME_SIZE, 0, MAX_FAC_NAME_SIZE);
+
+ const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ WINDOW *w_list = newwin(25, 80, ((iMaxY > 25) ? (iMaxY-25)/2 : 0), (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+ WINDOW *w_info = newwin(23, 79 - MAX_FAC_NAME_SIZE, 1 + ((iMaxY > 25) ? (iMaxY-25)/2 : 0), MAX_FAC_NAME_SIZE + ((iMaxX > 80) ? (iMaxX-80)/2 : 0));
+
+ wborder(w_list, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
+                 LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
+
  int maxlength = 79 - MAX_FAC_NAME_SIZE;
  int sel = 0;
 
 // Init w_list content
- mvwprintz(w_list, 0, 0, c_white, title.c_str());
+ mvwprintz(w_list, 1, 1, c_white, title.c_str());
  for (int i = 0; i < valfac.size(); i++) {
   nc_color col = (i == 0 ? h_white : c_white);
-  mvwprintz(w_list, i + 1, 0, col, valfac[i].name.c_str());
+  mvwprintz(w_list, i + 2, 1, col, valfac[i].name.c_str());
  }
  wrefresh(w_list);
 // Init w_info content
@@ -2242,14 +2266,14 @@ faction* game::list_factions(std::string title)
   input = get_input();
   switch ( input ) {
   case DirectionS:	// Move selection down
-   mvwprintz(w_list, sel + 1, 0, c_white, valfac[sel].name.c_str());
+   mvwprintz(w_list, sel + 2, 1, c_white, valfac[sel].name.c_str());
    if (sel == valfac.size() - 1)
     sel = 0;	// Wrap around
    else
     sel++;
    break;
   case DirectionN:	// Move selection up
-   mvwprintz(w_list, sel + 1, 0, c_white, valfac[sel].name.c_str());
+   mvwprintz(w_list, sel + 2, 1, c_white, valfac[sel].name.c_str());
    if (sel == 0)
     sel = valfac.size() - 1;	// Wrap around
    else
@@ -2261,7 +2285,7 @@ faction* game::list_factions(std::string title)
    break;
   }
   if (input == DirectionS || input == DirectionN) {	// Changed our selection... update the windows
-   mvwprintz(w_list, sel + 1, 0, h_white, valfac[sel].name.c_str());
+   mvwprintz(w_list, sel + 2, 1, h_white, valfac[sel].name.c_str());
    wrefresh(w_list);
    werase(w_info);
 // fac_*_text() is in faction.cpp
@@ -2294,30 +2318,56 @@ faction* game::list_factions(std::string title)
 
 void game::list_missions()
 {
- WINDOW *w_missions = newwin(25, 80, 0, 0);
+ const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ WINDOW *w_missions = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+
  int tab = 0, selection = 0;
  InputEvent input;
  do {
   werase(w_missions);
-  draw_tabs(w_missions, tab, "ACTIVE MISSIONS", "COMPLETED MISSIONS",
-            "FAILED MISSIONS", NULL);
+  //draw_tabs(w_missions, tab, "ACTIVE MISSIONS", "COMPLETED MISSIONS", "FAILED MISSIONS", NULL);
   std::vector<int> umissions;
   switch (tab) {
    case 0: umissions = u.active_missions;	break;
    case 1: umissions = u.completed_missions;	break;
    case 2: umissions = u.failed_missions;	break;
   }
-  for (int y = 3; y < 25; y++)
-   mvwputch(w_missions, y, 30, c_white, LINE_XOXO);
+
+  for (int i = 1; i < 79; i++) {
+   mvwputch(w_missions, 2, i, c_ltgray, LINE_OXOX);
+   mvwputch(w_missions, 24, i, c_ltgray, LINE_OXOX);
+
+   if (i > 2 && i < 24) {
+    mvwputch(w_missions, i, 0, c_ltgray, LINE_XOXO);
+    mvwputch(w_missions, i, 30, c_ltgray, LINE_XOXO);
+    mvwputch(w_missions, i, 79, c_ltgray, LINE_XOXO);
+   }
+  }
+
+  draw_tab(w_missions, 7, "ACTIVE MISSIONS", (tab == 0) ? true : false);
+  draw_tab(w_missions, 30, "COMPLETED MISSIONS", (tab == 1) ? true : false);
+  draw_tab(w_missions, 56, "FAILED MISSIONS", (tab == 2) ? true : false);
+
+  mvwputch(w_missions, 2,  0, c_white, LINE_OXXO); // |^
+  mvwputch(w_missions, 2, 79, c_white, LINE_OOXX); // ^|
+
+  mvwputch(w_missions, 24, 0, c_ltgray, LINE_XXOO); // |_
+  mvwputch(w_missions, 24, 79, c_ltgray, LINE_XOOX); // _|
+
+  mvwputch(w_missions, 2, 30, c_white, (tab == 1) ? LINE_XOXX : LINE_XXXX); // + || -|
+  mvwputch(w_missions, 24, 30, c_white, LINE_XXOX); // _|_
+
   for (int i = 0; i < umissions.size(); i++) {
    mission *miss = find_mission(umissions[i]);
    nc_color col = c_white;
    if (i == u.active_mission && tab == 0)
     col = c_ltred;
    if (selection == i)
-    mvwprintz(w_missions, 3 + i, 0, hilite(col), miss->name().c_str());
+    mvwprintz(w_missions, 3 + i, 1, hilite(col), miss->name().c_str());
    else
-    mvwprintz(w_missions, 3 + i, 0, col, miss->name().c_str());
+    mvwprintz(w_missions, 3 + i, 1, col, miss->name().c_str());
   }
 
   if (selection >= 0 && selection < umissions.size()) {
@@ -2368,7 +2418,7 @@ void game::list_missions()
    break;
   }
 
- } while (input != Cancel);
+ } while (input != Cancel && input != Close);
 
 
  werase(w_missions);
@@ -3276,8 +3326,8 @@ void game::monmove()
      if (cur_om.zg[group].population / pow(cur_om.zg[group].radius, 2.0) > 5 &&
          !cur_om.zg[group].diffuse )
       cur_om.zg[group].radius++;
-    } else if (mt_to_mc((mon_id)(z[i].type->id)) != mcat_null) {
-     cur_om.zg.push_back(mongroup(mt_to_mc((mon_id)(z[i].type->id)),
+    } else if (MonsterGroupManager::Monster2Group((mon_id)(z[i].type->id)) != "GROUP_NULL") {
+     cur_om.zg.push_back(mongroup(MonsterGroupManager::Monster2Group((mon_id)(z[i].type->id)),
                                   levx, levy, 1, 1));
     }
     z[i].dead = true;
@@ -3674,7 +3724,7 @@ void game::resonance_cascade(int x, int y)
    case 13:
    case 14:
    case 15:
-    spawn = moncats[mcat_nether][rng(0, moncats[mcat_nether].size() - 1)];
+    spawn = MonsterGroupManager::GetMonsterFromGroup("GROUP_NETHER");
     invader = monster(mtypes[spawn], i, j);
     z.push_back(invader);
     break;
@@ -5133,17 +5183,32 @@ bool game::list_items_match(std::string sText, std::string sPattern)
 
 void game::list_items()
 {
- int iInfoHeight = 10;
- WINDOW* w_items = newwin(25-iInfoHeight, 55, 0, TERRAIN_WINDOW_WIDTH);
- WINDOW* w_item_info = newwin(iInfoHeight, 55, 25-iInfoHeight, TERRAIN_WINDOW_WIDTH);
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ int iInfoHeight = 12;
+ WINDOW* w_items = newwin(iMaxY-iInfoHeight, 55, 0, TERRAIN_WINDOW_WIDTH);
+ WINDOW* w_item_info = newwin(iInfoHeight-1, 53, iMaxY-iInfoHeight, TERRAIN_WINDOW_WIDTH+1);
+ WINDOW* w_item_info_border = newwin(iInfoHeight, 55, iMaxY-iInfoHeight, TERRAIN_WINDOW_WIDTH);
+
+ for (int j=0; j < iInfoHeight-1; j++)
+  mvwputch(w_item_info_border, j, 0, c_ltgray, LINE_XOXO);
+
+ for (int j=0; j < iInfoHeight-1; j++)
+  mvwputch(w_item_info_border, j, 54, c_ltgray, LINE_XOXO);
+
+ for (int j=0; j < 54; j++)
+  mvwputch(w_item_info_border, iInfoHeight-1, j, c_ltgray, LINE_OXOX);
+
+ mvwputch(w_item_info_border, iInfoHeight-1, 0, c_ltgray, LINE_XXOO);
+ mvwputch(w_item_info_border, iInfoHeight-1, 54, c_ltgray, LINE_XOOX);
 
  std::vector <item> here;
  std::map<int, std::map<int, std::map<std::string, int> > > grounditems;
  std::map<std::string, item> iteminfo;
 
  //Area to search +- of players position. TODO: Use Perception
- int iSearchX = 12 + ((VIEWX > 12) ? ((VIEWX-12)/2) : 0);
- int iSearchY = 12 + ((VIEWY > 12) ? ((VIEWY-12)/2) : 0);
+ const int iSearchX = 12 + ((VIEWX > 12) ? ((VIEWX-12)/2) : 0);
+ const int iSearchY = 12 + ((VIEWY > 12) ? ((VIEWY-12)/2) : 0);
  int iItemNum = 0;
 
  int iTile;
@@ -5165,11 +5230,11 @@ void game::list_items()
   }
  }
 
- int iStoreViewOffsetX = u.view_offset_x;
- int iStoreViewOffsetY = u.view_offset_y;
+ const int iStoreViewOffsetX = u.view_offset_x;
+ const int iStoreViewOffsetY = u.view_offset_y;
 
  int iActive = 0;
- int iMaxRows = 25-iInfoHeight-2;
+ const int iMaxRows = iMaxY-iInfoHeight-2;
  int iStartPos = 0;
  int iActiveX = 0;
  int iActiveY = 0;
@@ -5195,12 +5260,13 @@ void game::list_items()
     for (int i = 0; i < iInfoHeight-1; i++)
      mvwprintz(w_item_info, i, 1, c_black, "%s", "                                                     ");
 
-    mvwprintz(w_item_info, 0, 2, c_white, "%s", "How to use the filter:");
-    mvwprintz(w_item_info, 1, 2, c_white, "%s", "Example: pi  will match any itemname with pi in it.");
-    mvwprintz(w_item_info, 3, 2, c_white, "%s", "Seperate multiple items with ,");
-    mvwprintz(w_item_info, 4, 2, c_white, "%s", "Example: back,flash,aid, ,band");
-    mvwprintz(w_item_info, 6, 2, c_white, "%s", "To exclude certain items, place a - in front");
-    mvwprintz(w_item_info, 7, 2, c_white, "%s", "Example: -pipe,chunk,steel");
+    mvwprintz(w_item_info, 2, 2, c_white, "%s", "How to use the filter:");
+    mvwprintz(w_item_info, 3, 2, c_white, "%s", "Example: pi  will match any itemname with pi in it.");
+    mvwprintz(w_item_info, 5, 2, c_white, "%s", "Seperate multiple items with ,");
+    mvwprintz(w_item_info, 6, 2, c_white, "%s", "Example: back,flash,aid, ,band");
+    mvwprintz(w_item_info, 8, 2, c_white, "%s", "To exclude certain items, place a - in front");
+    mvwprintz(w_item_info, 9, 2, c_white, "%s", "Example: -pipe,chunk,steel");
+    wrefresh(w_item_info_border);
     wrefresh(w_item_info);
 
     sFilter = string_input_popup("Filter:", 55, sFilter);
@@ -5217,9 +5283,9 @@ void game::list_items()
    if (ch == '.') {
     for (int i = 1; i < 54; i++) {
      mvwputch(w_items, 0, i, c_ltgray, LINE_OXOX); // -
-     mvwputch(w_items, 25-iInfoHeight-1, i, c_ltgray, LINE_OXOX); // -
+     mvwputch(w_items, iMaxY-iInfoHeight-1, i, c_ltgray, LINE_OXOX); // -
 
-     if (i < 25-iInfoHeight) {
+     if (i < iMaxY-iInfoHeight) {
       mvwputch(w_items, i, 0, c_ltgray, LINE_XOXO); // |
       mvwputch(w_items, i, 54, c_ltgray, LINE_XOXO); // |
      }
@@ -5228,20 +5294,20 @@ void game::list_items()
     mvwputch(w_items, 0,  0, c_ltgray, LINE_OXXO); // |^
     mvwputch(w_items, 0, 54, c_ltgray, LINE_OOXX); // ^|
 
-    mvwputch(w_items, 25-iInfoHeight-1,  0, c_ltgray, LINE_XXXO); // |-
-    mvwputch(w_items, 25-iInfoHeight-1, 54, c_ltgray, LINE_XOXX); // -|
+    mvwputch(w_items, iMaxY-iInfoHeight-1,  0, c_ltgray, LINE_XXXO); // |-
+    mvwputch(w_items, iMaxY-iInfoHeight-1, 54, c_ltgray, LINE_XOXX); // -|
 
     int iTempStart = 19;
     if (sFilter != "") {
      iTempStart = 15;
-     mvwprintz(w_items, 25-iInfoHeight-1, iTempStart + 19, c_ltgreen, " %s", "R");
+     mvwprintz(w_items, iMaxY-iInfoHeight-1, iTempStart + 19, c_ltgreen, " %s", "R");
      wprintz(w_items, c_white, "%s", "eset ");
     }
 
-    mvwprintz(w_items, 25-iInfoHeight-1, iTempStart, c_ltgreen, " %s", "C");
+    mvwprintz(w_items, iMaxY-iInfoHeight-1, iTempStart, c_ltgreen, " %s", "C");
     wprintz(w_items, c_white, "%s", "ompare ");
 
-    mvwprintz(w_items, 25-iInfoHeight-1, iTempStart + 10, c_ltgreen, " %s", "F");
+    mvwprintz(w_items, iMaxY-iInfoHeight-1, iTempStart + 10, c_ltgreen, " %s", "F");
     wprintz(w_items, c_white, "%s", "ilter ");
 
     refresh_all();
@@ -5330,18 +5396,6 @@ void game::list_items()
     wclear(w_item_info);
     mvwprintz(w_item_info, 0, 0, c_white, "%s", iteminfo[sActiveItemName].info().c_str());
 
-    for (int j=0; j < iInfoHeight-1; j++)
-     mvwputch(w_item_info, j, 0, c_ltgray, LINE_XOXO);
-
-    for (int j=0; j < iInfoHeight-1; j++)
-     mvwputch(w_item_info, j, 54, c_ltgray, LINE_XOXO);
-
-    for (int j=0; j < 54; j++)
-     mvwputch(w_item_info, iInfoHeight-1, j, c_ltgray, LINE_OXOX);
-
-    mvwputch(w_item_info, iInfoHeight-1, 0, c_ltgray, LINE_XXOO);
-    mvwputch(w_item_info, iInfoHeight-1, 54, c_ltgray, LINE_XOOX);
-
     //Only redraw trail/terrain if x/y position changed
     if (iActiveX != iLastActiveX || iActiveY != iLastActiveY) {
      iLastActiveX = iActiveX;
@@ -5365,6 +5419,7 @@ void game::list_items()
     }
 
     wrefresh(w_items);
+    wrefresh(w_item_info_border);
     wrefresh(w_item_info);
    }
 
@@ -5612,7 +5667,7 @@ void game::pickup(int posx, int posy, int min)
   }
   wrefresh(w_pickup);
   ch = getch();
- } while (ch != ' ' && ch != '\n');
+ } while (ch != ' ' && ch != '\n' && ch != KEY_ESCAPE);
  if (ch != '\n') {
   werase(w_pickup);
   wrefresh(w_pickup);
@@ -6897,7 +6952,10 @@ void game::chat()
  } else if (available.size() == 1)
   available[0]->talk_to_u(this);
  else {
-  WINDOW *w = newwin(available.size() + 3, 40, 10, 20);
+  const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+  const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+  WINDOW *w = newwin(available.size() + 3, 40, (iMaxY-available.size() + 3)/2, (iMaxX-40)/2);
   wborder(w, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
              LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
   for (int i = 0; i < available.size(); i++)
@@ -7999,10 +8057,7 @@ void game::spawn_mon(int shiftx, int shifty)
     nextspawn += rng(group * 4 + z.size() * 4, group * 10 + z.size() * 10);
 
    for (int j = 0; j < group; j++) {	// For each monster in the group...
-    mon_id type = valid_monster_from(moncats[cur_om.zg[i].type]);
-    if (type == mon_null)
-     j = group;	// No monsters may be spawned; not soon enough?
-    else {
+    mon_id type = MonsterGroupManager::GetMonsterFromGroup(cur_om.zg[i].type, (int)turn, &mtypes);
      zom = monster(mtypes[type]);
      iter = 0;
      do {
@@ -8033,7 +8088,6 @@ void game::spawn_mon(int shiftx, int shifty)
       zom.spawn(monx, mony);
       z.push_back(zom);
      }
-    }
    }	// Placing monsters of this group is done!
    if (cur_om.zg[i].population <= 0) { // Last monster in the group spawned...
     cur_om.zg.erase(cur_om.zg.begin() + i); // ...so remove that group
@@ -8043,31 +8097,6 @@ void game::spawn_mon(int shiftx, int shifty)
  }
 }
 
-mon_id game::valid_monster_from(std::vector<mon_id> group)
-{
- std::vector<mon_id> valid;
- int rntype = 0;
- for (int i = 0; i < group.size(); i++) {
-  if (mtypes[group[i]]->frequency > 0 &&
-      int(turn) + 900 >=
-          MINUTES(STARTING_MINUTES) + HOURS(mtypes[group[i]]->difficulty)){
-   valid.push_back(group[i]);
-   rntype += mtypes[group[i]]->frequency;
-  }
- }
- if (valid.size() == 0)
-  return mon_null;
- int curmon = -1;
- if (rntype > 0)
-  rntype = rng(0, rntype - 1);	// rntype set to [0, rntype)
- do {
-  curmon++;
-  rntype -= mtypes[valid[curmon]]->frequency;
- } while (rntype > 0);
- return valid[curmon];
-}
-
-
 int game::valid_group(mon_id type, int x, int y)
 {
  std::vector <int> valid_groups;
@@ -8076,21 +8105,15 @@ int game::valid_group(mon_id type, int x, int y)
  for (int i = 0; i < cur_om.zg.size(); i++) {
   dist = trig_dist(x, y, cur_om.zg[i].posx, cur_om.zg[i].posy);
   if (dist < cur_om.zg[i].radius) {
-   for (int j = 0; j < (moncats[cur_om.zg[i].type]).size(); j++) {
-    if (type == (moncats[cur_om.zg[i].type])[j]) {
+   if(MonsterGroupManager::IsMonsterInGroup(cur_om.zg[i].type, type)) {
      valid_groups.push_back(i);
-     j = (moncats[cur_om.zg[i].type]).size();
     }
-   }
   } else if (dist < cur_om.zg[i].radius + 3) {
-   for (int j = 0; j < (moncats[cur_om.zg[i].type]).size(); j++) {
-    if (type == (moncats[cur_om.zg[i].type])[j]) {
+   if(MonsterGroupManager::IsMonsterInGroup(cur_om.zg[i].type, type)) {
      semi_valid.push_back(i);
-     j = (moncats[cur_om.zg[i].type]).size();
     }
    }
   }
- }
  if (valid_groups.size() == 0) {
   if (semi_valid.size() == 0)
    return -1;
@@ -8185,10 +8208,10 @@ void game::write_msg()
 
 void game::msg_buffer()
 {
- WINDOW *w = newwin(25, 80, 0, 0);
- wborder(w, LINE_XOXO, LINE_XOXO, LINE_OXOX, LINE_OXOX,
-            LINE_OXXO, LINE_OOXX, LINE_XXOO, LINE_XOOX );
- mvwprintz(w, 24, 32, c_red, "Press q to return");
+ const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
+ const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
+
+ WINDOW *w = newwin(25, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
 
  int offset = 0;
  InputEvent input;
@@ -8255,7 +8278,7 @@ void game::msg_buffer()
   if (diry == 1 && offset < messages.size())
    offset++;
 
- } while (input != Close);
+ } while (input != Close && input != Cancel && input != Confirm);
 
  werase(w);
  delwin(w);
@@ -8366,17 +8389,6 @@ oter_id game::ter_at(int omx, int omy, bool& mark_as_seen)
  return ret;
 }
 
-moncat_id game::mt_to_mc(mon_id type)
-{
- for (int i = 0; i < num_moncats; i++) {
-  for (int j = 0; j < (moncats[i]).size(); j++) {
-   if ((moncats[i])[j] == type)
-    return (moncat_id)(i);
-  }
- }
- return mcat_null;
-}
-
 nc_color sev(int a)
 {
  switch (a) {
@@ -8393,7 +8405,7 @@ nc_color sev(int a)
 
 void game::display_scent()
 {
- int div = 1 + query_int("Sensitivity");
+ int div = 1 + query_int(this->VIEWX, this->VIEWY, "Sensitivity");
  draw_ter();
  for (int x = u.posx - getmaxx(w_terrain)/2; x <= u.posx + getmaxx(w_terrain)/2; x++) {
   for (int y = u.posy - getmaxy(w_terrain)/2; y <= u.posy + getmaxy(w_terrain)/2; y++) {
