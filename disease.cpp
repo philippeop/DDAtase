@@ -860,7 +860,7 @@ void dis_effect(game *g, player &p, disease &dis)
    dis.intensity--;
   break;
 
- case DI_TELEGLOW:
+ /*case DI_TELEGLOW:
 // Default we get around 300 duration points per teleport (possibly more
 // depending on the source).
 // TODO: Include a chance to teleport to the nether realm.
@@ -939,8 +939,8 @@ void dis_effect(game *g, player &p, disease &dis)
    p.add_disease(DI_FUNGUS, -1, g);
    p.rem_disease(DI_TELEGLOW);
   }
-  break;
-
+  break;*/
+/*
  case DI_ATTENTION:
   if (one_in( 100000 / dis.duration ) && one_in( 100000 / dis.duration ) &&
       one_in(250)) {
@@ -966,7 +966,7 @@ void dis_effect(game *g, player &p, disease &dis)
    }
   }
   break;
-
+*/
  case DI_EVIL: {
   bool lesser = false; // Worn or wielded; diminished effects
   if (p.weapon.is_artifact() && p.weapon.is_tool()) {

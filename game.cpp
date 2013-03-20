@@ -3374,7 +3374,7 @@ void game::sound(int x, int y, int vol, std::string description)
  }
 // Loud sounds make the next spawn sooner!//Oddzball-fixed accelerrated spawn
  int spawn_range = int(MAPSIZE / 2) * SEEX;
- if ((vol*1.5) >= spawn_range) { 
+ if ((vol*1.5) >= spawn_range) {
   int max = ((vol*1.5) - spawn_range);
   int min = int(max / 6);
   if (max > spawn_range * 4)
@@ -3672,7 +3672,7 @@ void game::use_computer(int x, int y)
 }
 
 void game::resonance_cascade(int x, int y)
-{
+{/*
  int maxglow = 100 - 5 * trig_dist(x, y, u.posx, u.posy);
  int minglow =  60 - 5 * trig_dist(x, y, u.posx, u.posy);
  mon_id spawn;
@@ -3738,7 +3738,7 @@ void game::resonance_cascade(int x, int y)
     break;
    }
   }
- }
+ }*/
 }
 
 void game::scrambler_blast(int x, int y)

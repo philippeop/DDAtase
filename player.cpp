@@ -3117,7 +3117,7 @@ void player::suffer(game *g)
   radiation += rng(0, g->m.radiation(posx, posy) / 8);
 
  if (rng(1, 2500) < radiation && (int(g->turn) % 150 == 0 || radiation > 2000)){
-  mutate(g);
+  //mutate(g);
   if (radiation > 2000)
    radiation = 2000;
   radiation /= 2;

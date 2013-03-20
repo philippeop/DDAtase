@@ -1242,7 +1242,7 @@ void map::draw_map(const oter_id terrain_type, const oter_id t_north, const oter
   if (one_in(10)) { //Oddzball-Spawn Zombie! 1 in 10 houses
        add_spawn(mon_zombie, rng(1, 5), rng(7, 11), rng(7, 11));
    }
-   else if (one_in(100)) { // Oddzball-Rats! 
+   else if (one_in(100)) { // Oddzball-Rats!
    add_spawn(mon_sewer_rat, rng(1, 10), rng(7, 11), rng(7, 11));
   }
 
@@ -9095,7 +9095,7 @@ void map::add_extra(map_extra type, game *g)
   }
  }
  break;
-
+/*
  case mx_portal:
  {
   int x = rng(1, SEEX * 2 - 2), y = rng(1, SEEY * 2 - 2);
@@ -9113,7 +9113,7 @@ void map::add_extra(map_extra type, game *g)
   }
  }
  break;
-
+*/
  case mx_minefield:
  {
   int num_mines = rng(6, 20);
@@ -9162,7 +9162,7 @@ void map::add_extra(map_extra type, game *g)
    ter(fumarole[i].x, fumarole[i].y) = t_lava;
  }
  break;
-
+/*
  case mx_portal_in:
  {
   int x = rng(5, SEEX * 2 - 6), y = rng(5, SEEY * 2 - 6);
@@ -9183,7 +9183,7 @@ void map::add_extra(map_extra type, game *g)
   }
  }
  break;
-
+*/
  case mx_anomaly: {
   point center( rng(6, SEEX * 2 - 7), rng(6, SEEY * 2 - 7) );
   artifact_natural_property prop =
