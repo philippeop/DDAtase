@@ -219,6 +219,9 @@ class game
   void consume_items(std::vector<component> components);
   void consume_tools(std::vector<component> tools);
 
+  bool has_gametype() const { return gamemode && gamemode->id() != SGAME_NULL; }
+  special_game_id gametype() const { return (gamemode) ? gamemode->id() : SGAME_NULL; }
+
   std::vector <itype*> itypes;
   std::vector <mtype*> mtypes;
   std::vector <vehicle*> vtypes;
@@ -253,13 +256,6 @@ class game
   int weight_dragged; // Computed once, when you start dragging
   bool debugmon;
   bool no_npc;
-// Display data... TODO: Make this more portable?
-  int VIEWX;
-  int VIEWY;
-  int TERMX;
-  int TERMY;
-  int TERRAIN_WINDOW_WIDTH;
-  int TERRAIN_WINDOW_HEIGHT;
 
   WINDOW *w_terrain;
   WINDOW *w_minimap;
@@ -376,7 +372,7 @@ class game
   void update_stair_monsters();
   void despawn_monsters(const bool stairs = false, const int shiftx = 0, const int shifty = 0);
   void spawn_mon(int shift, int shifty); // Called by update_map, sometimes
-  int valid_group(mon_id type, int x, int y);// Picks a group from cur_om
+  int valid_group(mon_id type, int x, int y, int z);// Picks a group from cur_om
   void set_adjacent_overmaps(bool from_scratch = false);
 
 // Routine loop functions, approximately in order of execution
@@ -405,10 +401,6 @@ class game
   void disp_kills();       // Display the player's kill counts
   void disp_NPCs();        // Currently UNUSED.  Lists global NPCs.
   void list_missions();    // Listed current, completed and failed missions.
-
-// If x & y are OOB, creates a new overmap and returns the proper terrain; also,
-// may mark the square as seen by the player
-  oter_id ter_at(int x, int y, bool& mark_as_seen);
 
 // Debug functions
   void debug();           // All-encompassing debug screen.  TODO: This.

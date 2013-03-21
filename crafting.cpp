@@ -935,7 +935,7 @@ RECIPE(itm_tshirt_fit, CC_ARMOR, "tailor", NULL, 2, 38000, true);
   COMP(itm_string_6, 2, itm_sinew, 40, itm_plant_fibre, 40, NULL);
 
  RECIPE(itm_needle_bone, CC_MISC, "survival", NULL, 3, 20000, false);
-  TOOL(TG_KNIVES, NULL);
+  TOOL(TG_KNIVES, itm_toolset, -1, NULL);
   COMP(itm_bone, 1, NULL);
 
  RECIPE(itm_ragpouch, CC_ARMOR, "tailor",  NULL, 0, 10000, false);
@@ -969,6 +969,19 @@ RECIPE(itm_tshirt_fit, CC_ARMOR, "tailor", NULL, 2, 38000, true);
   TOOL(itm_sewing_kit, 60, itm_needle_bone, 60, NULL);
   COMP(itm_sinew, 40, itm_plant_fibre, 40, itm_string_36, 1, NULL);
   COMP(itm_leather, 6, itm_fur, 6, NULL);
+
+ RECIPE(itm_snare_trigger, CC_MISC, "survival", NULL, 1, 2000, false);
+  TOOL(TG_KNIVES, NULL);
+  COMP(itm_stick, 1, NULL);
+
+ RECIPE(itm_light_snare_kit, CC_MISC, "survival", "traps", 1, 5000, true);
+  COMP(itm_snare_trigger, 1, NULL);
+  COMP(itm_string_36, 1, NULL);
+
+ RECIPE(itm_heavy_snare_kit, CC_MISC, "survival", "traps", 3, 8000, true);
+  COMP(itm_snare_trigger, 1, NULL);
+  COMP(itm_rope_6, 1, NULL);
+  
 // MISC
 
 
@@ -1260,11 +1273,8 @@ void game::craft()
   return;
  }
 
- const int iMaxX = (VIEWX < 12) ? 80 : (VIEWX*2)+56;
- const int iMaxY = (VIEWY < 12) ? 25 : (VIEWY*2)+1;
-
- WINDOW *w_head = newwin( 3, 80, (iMaxY > 25) ? (iMaxY-25)/2 : 0, (iMaxX > 80) ? (iMaxX-80)/2 : 0);
- WINDOW *w_data = newwin(22, 80, 3 + ((iMaxY > 25) ? (iMaxY-25)/2 : 0), (iMaxX > 80) ? (iMaxX-80)/2 : 0);
+ WINDOW *w_head = newwin( 3, 80, (TERMY > 25) ? (TERMY-25)/2 : 0, (TERMX > 80) ? (TERMX -80)/2 : 0);
+ WINDOW *w_data = newwin(22, 80, 3 + ((TERMY > 25) ? (TERMY-25)/2 : 0), (TERMX  > 80) ? (TERMX -80)/2 : 0);
  craft_cat tab = CC_WEAPON;
  std::vector<recipe*> current;
  std::vector<bool> available;
@@ -1907,7 +1917,7 @@ void game::disassemble()
 
   item* dis_item = &u.i_at(ch);
 
-  if (OPTIONS[OPT_QUERY_DISASSEMBLE] && !(query_yn(this->VIEWX, this->VIEWY, "Really disassemble your %s?", dis_item->tname(this).c_str())))
+  if (OPTIONS[OPT_QUERY_DISASSEMBLE] && !(query_yn("Really disassemble your %s?", dis_item->tname(this).c_str())))
     return;
 
   for (int i = 0; i < recipes.size(); i++) {

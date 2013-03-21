@@ -13,10 +13,6 @@
 #define OMAPX 180
 #define OMAPY 180
 
-#define TUTORIAL_Z	10
-#define DEFENSE_Z	20
-#define NETHER_Z 	30
-
 class overmap;
 
 struct oter_t {
@@ -373,19 +369,20 @@ OMS_FLAG_BIG,		// As big as possible
 OMS_FLAG_ROAD,		// Add a road_point here; connect to towns etc.
 OMS_FLAG_PARKING_LOT,	// Add a road_point to the north of here
 OMS_FLAG_DIRT_LOT,      // Dirt lot flag for specials
+OMS_FLAG_CLASSIC, // Allow this location to spawn in classic mode
 NUM_OMS_FLAGS
 };
 
 struct omspec_place
 {
 // Able functions - true if p is valid
- bool never      (overmap *om, point p) { return false; }
- bool always     (overmap *om, point p) { return true;  }
- bool water      (overmap *om, point p); // Only on rivers
- bool land       (overmap *om, point p); // Only on land (no rivers)
- bool forest     (overmap *om, point p); // Forest
- bool wilderness (overmap *om, point p); // Forest or fields
- bool by_highway (overmap *om, point p); // Next to existing highways
+ bool never      (overmap *om, tripoint p) { return false; }
+ bool always     (overmap *om, tripoint p) { return true;  }
+ bool water      (overmap *om, tripoint p); // Only on rivers
+ bool land       (overmap *om, tripoint p); // Only on land (no rivers)
+ bool forest     (overmap *om, tripoint p); // Forest
+ bool wilderness (overmap *om, tripoint p); // Forest or fields
+ bool by_highway (overmap *om, tripoint p); // Next to existing highways
 };
 
 struct overmap_special
@@ -402,7 +399,7 @@ struct overmap_special
  int monster_rad_min;   // Minimum monster radius
  int monster_rad_max;   // Maximum monster radius
 
- bool (omspec_place::*able) (overmap *om, point p); // See above
+ bool (omspec_place::*able) (overmap *om, tripoint p); // See above
  unsigned flags : NUM_OMS_FLAGS; // See above
 };
 
@@ -446,25 +443,25 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
 
 // Terrain	 MIN MAX DISTANCE
 {ot_crater,	   0, 10,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::land, mfb(OMS_FLAG_BLOB)},
+ &omspec_place::land, mfb(OMS_FLAG_BLOB) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_hive, 	   0, 0, 10, -1, "GROUP_BEE", 20, 60, 2, 4, //Oddzball No Bee Hives
  &omspec_place::never, mfb(OMS_FLAG_3X3)},
 
 {ot_house_north,   0,100,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, mfb(OMS_FLAG_ROTATE_ROAD)},
+ &omspec_place::by_highway, mfb(OMS_FLAG_ROTATE_ROAD) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_s_gas_north,   0,100,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, mfb(OMS_FLAG_ROTATE_ROAD)},
+ &omspec_place::by_highway, mfb(OMS_FLAG_ROTATE_ROAD) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_cabin,   0, 30, 20, -1, "GROUP_NULL", 0, 0, 0, 0,  // Woods cabin
- &omspec_place::forest, 0},
+ &omspec_place::forest, mfb(OMS_FLAG_CLASSIC)},
 
  {ot_lmoe,   0, 3, 20, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::land, 0},
+ &omspec_place::land, mfb(OMS_FLAG_CLASSIC)},
 
  {ot_farm,   5, 10, 20, -1, "GROUP_NULL", 0, 0, 0, 0,  // Oddzball-farm
- &omspec_place::wilderness, mfb(OMS_FLAG_3X3_SECOND) |mfb(OMS_FLAG_DIRT_LOT)},
+ &omspec_place::wilderness, mfb(OMS_FLAG_3X3_SECOND) |mfb(OMS_FLAG_DIRT_LOT) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_temple_stairs, 0,  3, 20, -1, "GROUP_NULL", 0, 0, 0, 0,
  &omspec_place::never, 0},
@@ -473,7 +470,7 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
  &omspec_place::never, mfb(OMS_FLAG_ROAD)},
 
 {ot_fema_entrance,	   0, 5,  8, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::land, mfb(OMS_FLAG_3X3_SECOND)},
+ &omspec_place::land, mfb(OMS_FLAG_3X3_SECOND) | mfb(OMS_FLAG_CLASSIC)},
 
 // Terrain	 MIN MAX DISTANCE
 {ot_bunker,	   2, 10,  4, -1, "GROUP_NULL", 0, 0, 0, 0,
@@ -486,22 +483,22 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
  &omspec_place::wilderness, mfb(OMS_FLAG_ROAD)},
 
 {ot_radio_tower,   1,  5,  0, 20, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, 0},
+ &omspec_place::by_highway, mfb(OMS_FLAG_CLASSIC)},
 
 {ot_mansion_entrance, 0, 8, 0, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND)},
+ &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_mansion_entrance, 0, 4, 10, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::wilderness, mfb(OMS_FLAG_3X3_SECOND)},
+ &omspec_place::wilderness, mfb(OMS_FLAG_3X3_SECOND) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_megastore_entrance, 0, 5, 0, 10, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND)},
+ &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_hospital_entrance, 1, 5, 3, 15, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND)},
+ &omspec_place::by_highway, mfb(OMS_FLAG_3X3_SECOND) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_sewage_treatment, 1,  5, 10, 20, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::land, mfb(OMS_FLAG_PARKING_LOT)},
+ &omspec_place::land, mfb(OMS_FLAG_PARKING_LOT) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_mine_entrance,  0,  5,  15, -1, "GROUP_NULL", 0, 0, 0, 0,
  &omspec_place::wilderness, mfb(OMS_FLAG_PARKING_LOT)},
@@ -523,17 +520,17 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
  &omspec_place::never, 0},
 
 {ot_river_center,  0, 10, 10, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::always, mfb(OMS_FLAG_BLOB)},
+ &omspec_place::always, mfb(OMS_FLAG_BLOB) | mfb(OMS_FLAG_CLASSIC)},
 
 // Terrain	 MIN MAX DISTANCE
 {ot_shelter,       5, 10,  5, 10, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::wilderness, mfb(OMS_FLAG_ROAD)},
+ &omspec_place::wilderness, mfb(OMS_FLAG_ROAD) | mfb(OMS_FLAG_CLASSIC)},
 
 {ot_cave,	   0, 30,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
  &omspec_place::wilderness, 0},
 
 {ot_toxic_dump,	   0,  5, 15, -1, "GROUP_NULL", 0, 0, 0, 0,
- &omspec_place::wilderness,0}
+ &omspec_place::wilderness, mfb(OMS_FLAG_CLASSIC)}
 
 };
 
