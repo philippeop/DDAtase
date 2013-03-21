@@ -448,7 +448,7 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
 {ot_crater,	   0, 10,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
  &omspec_place::land, mfb(OMS_FLAG_BLOB)},
 
-{ot_hive, 	   0, 0, 10, -1, GROUP_BEE, 20, 60, 2, 4, //Oddzball No Bee Hives
+{ot_hive, 	   0, 0, 10, -1, "GROUP_BEE", 20, 60, 2, 4, //Oddzball No Bee Hives
  &omspec_place::never, mfb(OMS_FLAG_3X3)},
 
 {ot_house_north,   0,100,  0, -1, "GROUP_NULL", 0, 0, 0, 0,
@@ -463,7 +463,7 @@ const overmap_special overmap_specials[NUM_OMSPECS] = {
  {ot_lmoe,   0, 3, 20, -1, "GROUP_NULL", 0, 0, 0, 0,
  &omspec_place::land, 0},
 
- {ot_farm,   5, 10, 20, -1, GROUP_NULL, 0, 0, 0, 0,  // Oddzball-farm
+ {ot_farm,   5, 10, 20, -1, "GROUP_NULL", 0, 0, 0, 0,  // Oddzball-farm
  &omspec_place::wilderness, mfb(OMS_FLAG_3X3_SECOND) |mfb(OMS_FLAG_DIRT_LOT)},
 
 {ot_temple_stairs, 0,  3, 20, -1, "GROUP_NULL", 0, 0, 0, 0,

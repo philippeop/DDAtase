@@ -1245,8 +1245,7 @@ void map::draw_map(const oter_id terrain_type, const oter_id t_north, const oter
    else if (one_in(100)) { // Oddzball-Rats!
    add_spawn(mon_sewer_rat, rng(1, 10), rng(7, 11), rng(7, 11));
   }
-
-  } else if (one_in(150)) { // No wasps; black widows?
+  else if (one_in(150)) { // No wasps; black widows?
    for (int i = 0; i < SEEX * 2; i++) {
     for (int j = 0; j < SEEY * 2; j++) {
      if (ter(i, j) == t_floor) {
