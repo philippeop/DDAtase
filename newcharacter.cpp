@@ -239,8 +239,6 @@ End of cheatery */
  worn.push_back(tmp);
  tmp = item(g->itypes[itm_jacket_light], 0, 'd'); //Oddzball-Added a jacket to starting gear
  worn.push_back(tmp);
- tmp = item(g->itypes[itm_pockknife], 0, 'b' + worn.size());
- inv.push_back(tmp);
 // The near-sighted get to start with glasses.
  if (has_trait(PF_MYOPIC)) {
   tmp = item(g->itypes[itm_glasses_eye], 0, 'e');
