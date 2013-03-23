@@ -65,7 +65,7 @@ enum t_flag {
 
 struct ter_t {
  std::string name;
- char sym;
+ long sym;
  nc_color color;
  unsigned char movecost;
  trap_id trap;
@@ -261,31 +261,31 @@ const ter_t terlist[num_terrain_types] = {  // MUST match enum ter_id above!
 {"broken wood wall", '&', c_ltred,   0, tr_null,
 	mfb(transparent)|mfb(bashable)|mfb(flammable2)|mfb(noitem)|
     mfb(supports_roof)},
-{"wall",             '|', i_ltgray,  0, tr_null, //Oddzball-Changed Wall Graphics c_* to i_* should give us nicer walls
+{"wall",             LINE_XOXO, c_ltgray,  0, tr_null,
         mfb(flammable)|mfb(noitem)|mfb(supports_roof)},
-{"wall",             '-', i_ltgray,  0, tr_null,
+{"wall",             LINE_OXOX, c_ltgray,  0, tr_null,
         mfb(flammable)|mfb(noitem)|mfb(supports_roof)},
-{"concrete wall",    '|', i_dkgray,  0, tr_null,
+{"concrete wall",    LINE_XOXO, c_dkgray,  0, tr_null,
         mfb(noitem)|mfb(supports_roof)},
-{"concrete wall",    '-', i_dkgray,  0, tr_null,
+{"concrete wall",    LINE_OXOX, c_dkgray,  0, tr_null,
         mfb(noitem)|mfb(supports_roof)},
-{"metal wall",       '|', i_cyan,    0, tr_null,
+{"metal wall",       LINE_XOXO, c_cyan,    0, tr_null,
         mfb(noitem)|mfb(noitem)|mfb(supports_roof)},
-{"metal wall",       '-', i_cyan,    0, tr_null,
+{"metal wall",       LINE_OXOX, c_cyan,    0, tr_null,
         mfb(noitem)|mfb(noitem)|mfb(supports_roof)},
-{"glass wall",       '|', i_ltcyan,  0, tr_null,
+{"glass wall",       LINE_XOXO, c_ltcyan,  0, tr_null,
         mfb(transparent)|mfb(bashable)|mfb(noitem)|mfb(supports_roof)},
-{"glass wall",       '-', i_ltcyan,  0, tr_null,
+{"glass wall",       LINE_OXOX, c_ltcyan,  0, tr_null,
         mfb(transparent)|mfb(bashable)|mfb(noitem)|mfb(supports_roof)},
-{"glass wall",       '|', i_ltcyan,  0, tr_null, // Alarmed
+{"glass wall",       LINE_XOXO, c_ltcyan,  0, tr_null, // Alarmed
 	mfb(transparent)|mfb(bashable)|mfb(alarmed)|mfb(noitem)|
  mfb(supports_roof)},
-{"glass wall",       '-', i_ltcyan,  0, tr_null, // Alarmed
+{"glass wall",       LINE_OXOX, c_ltcyan,  0, tr_null, // Alarmed
 	mfb(transparent)|mfb(bashable)|mfb(alarmed)|mfb(noitem)|
  mfb(supports_roof)},
-{"reinforced glass", '|', c_ltcyan,  0, tr_null,
+{"reinforced glass", LINE_XOXO, c_ltcyan,  0, tr_null,
         mfb(transparent)|mfb(bashable)|mfb(noitem)|mfb(supports_roof)},
-{"reinforced glass", '-', c_ltcyan,  0, tr_null,
+{"reinforced glass", LINE_OXOX, c_ltcyan,  0, tr_null,
         mfb(transparent)|mfb(bashable)|mfb(noitem)|mfb(supports_roof)},
 {"metal bars",       '"', c_ltgray,  0, tr_null,
 	mfb(transparent)|mfb(noitem)},
